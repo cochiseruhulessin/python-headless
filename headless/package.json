@@ -1,8 +1,8 @@
 {
-  "description": "Enter a description for this Unimatrix package",
+  "description": "Headless - API client framework",
   "author": "Cochise Ruhulessin",
   "author_email": "cochise.ruhulessin@unimatrixone.io",
-  "url": "https://gitlab.com/unimatrixone",
+  "url": "https://gitlab.com/unimatrixone/libraries/python-unimatrix/headless",
   "licenses": "Proprietary",
   "install_requires": [
     "ckms"
