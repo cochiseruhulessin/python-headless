@@ -1,6 +1,5 @@
 import asyncio
 import functools
-from itertools import product
 import os
 import typing
 from collections.abc import AsyncIterator
