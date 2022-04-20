@@ -39,6 +39,14 @@ class IClient:
     ) -> IResponse:
         raise NotImplementedError
 
+    async def put(
+        self,
+        path: str,
+        params: typing.Any = None,
+        json: dict[str, typing.Any] | None = None
+    ) -> IResponse:
+        raise NotImplementedError
+
     async def get_server_time(self) -> int:
         """Return an integer indicating the server time, in seconds since
         the UNIX epoch.

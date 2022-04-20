@@ -1,6 +1,7 @@
 """Declares :class:`BaseClient`."""
 import types
 import typing
+import urllib.parse
 
 import httpx
 
@@ -18,15 +19,24 @@ class BaseClient(IClient):
         path: str,
         params: typing.Any = None
     ) -> IResponse:
-        response = typing.cast(
-            IResponse,
-            await self.request(
+        return await self.request(
                 method='GET',
                 path=path,
                 params=params
             )
+
+    async def put(
+        self,
+        path: str,
+        params: typing.Any = None,
+        json: dict[str, typing.Any] | None = None
+    ) -> IResponse:
+        return await self.request(
+            method='PUT',
+            path=path,
+            params=params,
+            json=json
         )
-        return response
 
     def get_absolute_url(self, path: str) -> str:
         return f"{self.server}{self.base_path}/{str.lstrip(path, '/')}"
@@ -36,17 +46,29 @@ class BaseClient(IClient):
         method: str,
         path: str,
         with_credential: bool = True,
-        params: typing.Any = None
-    ) -> httpx.Response:
+        params: typing.Any = None,
+        json: dict[str, typing.Any] | None = None
+    ) -> IResponse:
+        url = path
+        if self.is_relative_url(url):
+            url = self.get_absolute_url(path)
         request = httpx.Request(
             method=method,
-            url=self.get_absolute_url(path),
-            params=params
+            url=url,
+            params=params,
+            json=json
         )
         if with_credential:
             await self.credential.authenticate(typing.cast(IRequest, request))
         assert self.session is not None # nosec
-        return await self.session.send(request)
+        return typing.cast(
+            IResponse,
+            await self.session.send(request)
+        )
+
+    def is_relative_url(self, url: str) -> bool:
+        p = urllib.parse.urlparse(url)
+        return not bool(p.scheme and p.netloc)
 
     async def __aenter__(self) -> 'BaseClient':
         if self.session is None:

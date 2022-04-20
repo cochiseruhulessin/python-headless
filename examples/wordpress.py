@@ -1,5 +1,6 @@
 import asyncio
 import functools
+from itertools import product
 import os
 import typing
 from collections.abc import AsyncIterator
@@ -10,6 +11,21 @@ import headless
 class WooCommerceInterface:
     version: str = 'v3'
     base_path: str = f'/wp-json/wc/{version}'
+
+    async def update_stock(
+        self,
+        consumer: headless.types.IConsumer,
+        client: headless.types.IClient,
+        product_id: int,
+        stock_quantity: int
+    ) -> None:
+        await client.put(
+            f'products/{product_id}',
+            json={
+                'manage_stock': True,
+                'stock_quantity': stock_quantity
+            }
+        )
 
     async def get_products(
         self,
@@ -29,7 +45,8 @@ class WooCommerceInterface:
         while True:
             params = {
                 'page': page,
-                'per_page': per_page
+                'per_page': per_page,
+                'context': "edit"
             }
             response = await client.get(path, params=params)
             objects = response.json()
@@ -55,8 +72,7 @@ Consumer = functools.partial(
 
 async def main():
     async with Consumer() as api:
-        async for product in api.get_products():
-            print(f'{product["name"]}')
+        await api.update_stock(54, 555)
 
 
 if __name__ == '__main__':
