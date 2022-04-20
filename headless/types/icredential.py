@@ -9,7 +9,7 @@ class ICredential:
     """
     __module__: str = 'headless.types'
 
-    async def authenticate_request(self, request: IRequest) -> None:
+    async def authenticate(self, request: IRequest) -> None:
         """Authenticates a request, for example by setting the
         ``Authorization`` header or a session cookie.
         """
