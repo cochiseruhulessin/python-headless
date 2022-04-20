@@ -63,4 +63,4 @@ class IConsumer:
     def __getattr__(self, attname: str) -> typing.Any:
         if not hasattr(self.schema, attname):
             raise AttributeError(attname)
-        return functools.partial(getattr(self.schema, attname), self.client)
+        return functools.partial(getattr(self.schema, attname), self, self.client)

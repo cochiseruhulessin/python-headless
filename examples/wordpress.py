@@ -13,6 +13,7 @@ class WooCommerceInterface:
 
     async def get_products(
         self,
+        consumer: headless.types.IConsumer,
         client: headless.types.IClient
     ) -> AsyncIterator[headless.types.JSONObject]:
         async for dto in self.iterate(client=client, path='products'):
