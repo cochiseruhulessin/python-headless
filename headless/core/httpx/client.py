@@ -12,7 +12,8 @@ from typing import TypeVar
 import httpx
 
 from headless.types import IClient
-from .resource import Resource # type: ignore
+from ..resource import Resource # type: ignore
+from .response import Response
 
 
 R = TypeVar('R', bound=Resource)
@@ -21,6 +22,7 @@ T = TypeVar('T', bound='Client')
 
 class Client(IClient[httpx.Request, httpx.Response]):
     _client: httpx.AsyncClient
+    response_class: type[Response]
 
     def __init__(self, **kwargs: Any):
         self.params = kwargs
@@ -49,13 +51,13 @@ class Client(IClient[httpx.Request, httpx.Response]):
                 'Invalid response content type: '
                 '{response.headers.get("Content-Type")}'
             )
-        data = model.process_response('retrieve', response.json())
+        data = model.process_response('retrieve', await response.json())
         resource = model.parse_obj(data)
         resource._client = self # type: ignore
         return resource
 
-    async def send(self, request: httpx.Request) -> httpx.Response:
-        return await self._client.send(request)
+    async def send(self, request: httpx.Request) -> Response:
+        return Response.fromimpl(request, await self._client.send(request))
 
     async def __aenter__(self: T) -> T:
         await self._client.__aenter__()

@@ -6,13 +6,11 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from .headers import Headers
-from .iclient import IClient
-from .iresponse import IResponse
+from .client import Client
+from .response import Response
 
 
 __all__: list[str] = [
-    'Headers',
-    'IClient',
-    'IResponse'
+    'Client',
+    'Response'
 ]

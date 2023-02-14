@@ -10,6 +10,8 @@ from typing import Any
 from typing import Generic
 from typing import TypeVar
 
+from .iresponse import IResponse
+
 
 Request = TypeVar('Request')
 Response = TypeVar('Response')
@@ -20,6 +22,7 @@ T = TypeVar('T', bound='IClient[Any, Any]')
 class IClient(Generic[Request, Response]):
     """Specifies the interface for all API client implementations."""
     __module__: str = 'headless.types'
+    response_class: type[IResponse[Request, Response]]
 
     async def request(self, *args: Any, **kwargs: Any) -> Response:
         raise NotImplementedError
@@ -34,7 +37,7 @@ class IClient(Generic[Request, Response]):
     async def send(
         self,
         request: Request
-    ) -> Response:
+    ) -> IResponse[Request, Response]:
         raise NotImplementedError
 
     async def retrieve(self, model: type[M], resource_id: int | str) -> M:
