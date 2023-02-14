@@ -10,6 +10,7 @@ import datetime
 
 from headless.core import Resource
 from .purchaseorderproduct import PurchaseOrderProduct
+from .user import User
 
 
 class PurchaseOrder(Resource):
@@ -36,6 +37,11 @@ class PurchaseOrder(Resource):
     updated: datetime.datetime | None = None
     purchased_by_iduser: int | None = None
     purchased_at: datetime.datetime | None = None
+
+    async def get_purchaser(self) -> User | None:
+        return await self._client.retrieve(User, self.purchased_by_iduser)\
+            if self.purchased_by_iduser is not None\
+            else None
 
     class Meta:
         base_endpoint: str = '/v1/purchaseorders'

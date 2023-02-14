@@ -27,7 +27,9 @@ async def main():
     async with Client(**params) as client:
         print(repr(await client.retrieve(User, 13631)))
         print(repr(await client.retrieve(Warehouse, 6790)))
-        print(repr(await client.retrieve(PurchaseOrder, 1503164)))
+        order = await client.retrieve(PurchaseOrder, 1503164)
+        print(order)
+        print(await order.get_purchaser())
 
 
 if __name__ == '__main__':

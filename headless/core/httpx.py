@@ -50,7 +50,9 @@ class Client(IClient[httpx.Request, httpx.Response]):
                 '{response.headers.get("Content-Type")}'
             )
         data = model.process_response('retrieve', response.json())
-        return model.parse_obj(data)
+        resource = model.parse_obj(data)
+        resource._client = self # type: ignore
+        return resource
 
     async def send(self, request: httpx.Request) -> httpx.Response:
         return await self._client.send(request)

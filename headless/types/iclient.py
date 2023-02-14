@@ -13,6 +13,7 @@ from typing import TypeVar
 
 Request = TypeVar('Request')
 Response = TypeVar('Response')
+M = TypeVar('M')
 T = TypeVar('T', bound='IClient[Any, Any]')
 
 
@@ -34,6 +35,9 @@ class IClient(Generic[Request, Response]):
         self,
         request: Request
     ) -> Response:
+        raise NotImplementedError
+
+    async def retrieve(self, model: type[M], resource_id: int | str) -> M:
         raise NotImplementedError
 
     async def __aenter__(self: T) -> T:
