@@ -1,69 +1,43 @@
-"""Declares :class:`IClient`."""
-import types
-import typing
+# Copyright (C) 2022 Cochise Ruhulessin
+#
+# All rights reserved. No warranty, explicit or implicit, provided. In
+# no event shall the author(s) be liable for any claim or damages.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+from typing import Any
+from typing import Generic
+from typing import TypeVar
 
-from ckms.jose.models import JSONWebKeySet
 
-from .capabilitytype import CapabilityType
-from .icredential import ICredential
-from .iresponse import IResponse
+Request = TypeVar('Request')
+Response = TypeVar('Response')
+T = TypeVar('T', bound='IClient[Any, Any]')
 
 
-class IClient:
-    """The base interface of all headless client implementations."""
+class IClient(Generic[Request, Response]):
+    """Specifies the interface for all API client implementations."""
     __module__: str = 'headless.types'
-    base_path: str  = '/'
-    capabilities: list[CapabilityType]
-    server: str
-    credential: ICredential
 
-    def __init__(
-        self,
-        server: str,
-        credential: ICredential,
-        base_path: str = '/',
-        capabilities: list[CapabilityType] = []
-    ):
-        self.capabilities = list(capabilities)
-        self.server = server
-        self.credential = credential
-        self.base_path = base_path
-
-    async def discover(self) -> None:
-        pass
-
-    async def get(
-        self,
-        path: str,
-        params: typing.Any = None
-    ) -> IResponse:
+    async def request(self, *args: Any, **kwargs: Any) -> Response:
         raise NotImplementedError
 
-    async def put(
+    async def request_factory(
         self,
-        path: str,
-        params: typing.Any = None,
-        json: dict[str, typing.Any] | None = None
-    ) -> IResponse:
+        method: str,
+        url: str
+    ) -> Request:
         raise NotImplementedError
 
-    async def get_server_time(self) -> int:
-        """Return an integer indicating the server time, in seconds since
-        the UNIX epoch.
-        """
-        raise NotImplementedError
-
-    async def get_server_jwks(self) -> JSONWebKeySet:
-        """Lookup the JSON Web Key Set (JWKS) published by the
-        remote peer to encrypt sent data and verify signatures
-        created by it.
-        """
-        raise NotImplementedError
-
-    async def __aexit__(
+    async def send(
         self,
-        cls: type[BaseException],
-        exception: BaseException,
-        traceback: types.TracebackType
-    ) -> bool:
+        request: Request
+    ) -> Response:
+        raise NotImplementedError
+
+    async def __aenter__(self: T) -> T:
+        raise NotImplementedError
+
+    async def __aexit__(self, cls: type[BaseException], *args: Any) -> bool | None:
         raise NotImplementedError

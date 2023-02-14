@@ -6,9 +6,16 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from .iclient import IClient
+from headless.core import Resource
 
 
-__all__: list[str] = [
-    'IClient'
-]
+class Warehouse(Resource):
+    idwarehouse: int
+    name: str
+    accept_orders: bool
+    counts_for_general_stock: bool
+    priority: int
+    active: bool
+
+    class Meta:
+        base_endpoint: str = '/v1/warehouses'

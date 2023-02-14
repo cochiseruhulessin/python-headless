@@ -10,7 +10,8 @@
   "extras_require": {
     "all": [
       "aiohttp",
-      "httpx"
+      "httpx",
+      "pydantic"
     ],
     "aiohttp": [
       "aiohttp"

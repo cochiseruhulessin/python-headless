@@ -6,9 +6,16 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from .iclient import IClient
+import pydantic
 
 
-__all__: list[str] = [
-    'IClient'
-]
+class PurchaseOrderProduct(pydantic.BaseModel):
+    idproduct: int
+    idvatgroup: int | None = None
+    productcode: str
+    productcode_supplier: str | None = None
+    name: str
+    price: float
+    amount: int
+    amountreceived: int = 0
+    weight: int
