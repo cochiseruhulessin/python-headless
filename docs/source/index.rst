@@ -10,6 +10,7 @@ Application Programming Interfaces (APIs) are:
 - Unpredictable code execution paths because of weak typing,
   especially when the vendors' client library returns simple
   dictionaries or lists.
+- Validation and type checking logic scattered all over the codebase.
 - Unmaintainable spaghetti code when traversing a hierarchical
   object model.
 - Temporary failures in DNS resolution, connection timeouts or other
@@ -18,7 +19,16 @@ Application Programming Interfaces (APIs) are:
 The :mod:`headless` module, built on top of :mod:`pydantic` solves
 exactly these problems. It provides an framework to type check API
 resources and consume it without having to worry about unexpected
-input, rate limits, or temporary service failures.
+input, rate limits, or temporary service failures. The :mod:`headless`
+module is:
+
+- Asynchronous, because that is how external services should be consumed
+  during HTTP requests. It works great with :mod:`fastapi`, too!
+- Easy, because you don't have to worry about the implementation
+  details of asynchronous code. Define your resource models and you're
+  ready to go!
+- Robust, because using :mod:`headless` leads to a significant reduction
+  in production incidents.
 
 
 Getting started
