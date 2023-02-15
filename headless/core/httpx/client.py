@@ -12,7 +12,9 @@ from typing import TypeVar
 import httpx
 
 from headless.types import IClient
+from headless.types import ICredential
 from ..resource import Resource # type: ignore
+from .request import Request
 from .response import Response
 
 
@@ -22,9 +24,11 @@ T = TypeVar('T', bound='Client')
 
 class Client(IClient[httpx.Request, httpx.Response]):
     _client: httpx.AsyncClient
-    response_class: type[Response]
+    response_class: type[Response] = Response
+    request_class: type[Request] = Request
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, *, credential: ICredential | None = None, **kwargs: Any):
+        self.credential = credential or self.credential
         self.params = kwargs
         self._client = httpx.AsyncClient(**kwargs)
 
@@ -38,11 +42,10 @@ class Client(IClient[httpx.Request, httpx.Response]):
         """Discover the API endpoint using the class configuration
         and retrieve a single instance using the HTTP GET verb.
         """
-        request = await self.request_factory(
+        response = await self.request(
             method='GET',
             url=model._meta.get_retrieve_url(resource_id) # type: ignore
         )
-        response = await self.send(request)
         response.raise_for_status()
 
         # TODO: Abstract this to a separate class.
@@ -56,8 +59,8 @@ class Client(IClient[httpx.Request, httpx.Response]):
         resource._client = self # type: ignore
         return resource
 
-    async def send(self, request: httpx.Request) -> Response:
-        return Response.fromimpl(request, await self._client.send(request))
+    async def send(self, request: Request) -> Response: # type: ignore
+        return Response.fromimpl(request, await self._client.send(request.impl))
 
     async def __aenter__(self: T) -> T:
         await self._client.__aenter__()

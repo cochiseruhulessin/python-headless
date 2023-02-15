@@ -6,13 +6,19 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from .client import Client
-from .response import Response
-from .request import Request
+from headless.core import httpx
+from .credential import PicqerCredential
 
 
-__all__: list[str] = [
-    'Client',
-    'Request',
-    'Response'
-]
+class Client(httpx.Client):
+
+    def __init__(
+        self,
+        api_url: str,
+        api_email: str,
+        api_key: str,
+    ):
+        super().__init__(
+            base_url=api_url,
+            credential=PicqerCredential(api_email, api_key)
+        )

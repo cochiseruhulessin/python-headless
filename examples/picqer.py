@@ -9,20 +9,17 @@
 import asyncio
 import os
 
-import httpx
-from headless.core.httpx import Client
+from headless.ext.picqer import Client
 from headless.ext.picqer import PurchaseOrder
 from headless.ext.picqer import User
 from headless.ext.picqer import Warehouse
 
 
 async def main():
-    params: dict[str, httpx.BasicAuth | str | dict[str, str]] = {
-        'auth': httpx.BasicAuth(username=os.environ['MOLANO_PICQER_API_KEY'], password='x'),
-        'base_url': 'https://molano.picqer.com/api',
-        'headers': {
-            'User-Agent': 'MyPicqerClient (picqer.com/api - support@picqer.com)'
-        }
+    params: dict[str, str]  = {
+        'api_key': os.environ['MOLANO_PICQER_API_KEY'],
+        'api_email': 'test@headless.python.dev.unimatrixone.io',
+        'api_url': 'https://molano.picqer.com/api',
     }
     async with Client(**params) as client:
         print(repr(await client.retrieve(User, 13631)))

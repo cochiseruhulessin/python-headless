@@ -12,6 +12,7 @@ from typing import NoReturn
 from typing import TypeVar
 
 from .headers import Headers
+from .irequest import IRequest
 
 
 W = TypeVar('W')
@@ -21,13 +22,13 @@ Response = TypeVar('Response')
 class IResponse(Generic[Request, Response]):
     """A wrapper for response objects."""
     __module__: str = 'headless.core'
-    _request: Request
+    _request: IRequest[Request]
     _response: Response
 
     @classmethod
     def fromimpl(
         cls: type[W],
-        request: Request,
+        request: IRequest[Request],
         response: Response
     ) -> W:
         return cls(request, response)
@@ -36,7 +37,15 @@ class IResponse(Generic[Request, Response]):
     def headers(self) -> Headers:
         return self.get_headers()
 
-    def __init__(self, request: Request, response: Response) -> None:
+    @property
+    def impl(self) -> Response:
+        return self._response
+
+    @property
+    def request(self) -> IRequest[Request]:
+        return self._request
+
+    def __init__(self, request: IRequest[Request], response: Response) -> None:
         self._request = request
         self._response = response
 

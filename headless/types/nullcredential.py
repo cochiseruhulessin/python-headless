@@ -6,13 +6,8 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from .client import Client
-from .response import Response
-from .request import Request
+from .icredential import ICredential
 
 
-__all__: list[str] = [
-    'Client',
-    'Request',
-    'Response'
-]
+class NullCredential(ICredential):
+    __module__: str = 'headless.types'

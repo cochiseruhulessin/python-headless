@@ -6,13 +6,21 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+from .basicauth import BasicAuth
 from .headers import Headers
 from .iclient import IClient
+from .icredential import ICredential
 from .iresponse import IResponse
+from .irequest import IRequest
+from .nullcredential import NullCredential
 
 
 __all__: list[str] = [
+    'BasicAuth',
     'Headers',
     'IClient',
-    'IResponse'
+    'ICredential',
+    'IResponse',
+    'IRequest',
+    'NullCredential',
 ]
