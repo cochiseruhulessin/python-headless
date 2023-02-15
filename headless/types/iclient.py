@@ -44,10 +44,11 @@ class IClient(Generic[Request, Response]):
 
     def check_json(self, headers: Headers):
         # TODO: Abstract this to a separate class.
-        if headers.get('Content-Type') != 'application/json':
+        content_type = headers.get('Content-Type') or ''
+        if not str.startswith(content_type, 'application/json'):
             raise TypeError(
                 'Invalid response content type: '
-                '{response.headers.get("Content-Type")}'
+                f'{headers.get("Content-Type")}'
             )
 
     async def request(

@@ -34,6 +34,6 @@ class ResourceMetaclass(pydantic.main.ModelMetaclass):
                     f'{name} must define an inner Meta class describing the '
                     'resource endpoints.'
                 )
-            namespace['_meta'] = meta = ResourceMeta.frominnermeta(meta)
+            namespace['_meta'] = meta = ResourceMeta.frominnermeta(name, meta)
             pass
         return super().__new__(cls, name, bases, namespace, **params) # type: ignore
