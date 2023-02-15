@@ -8,22 +8,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import asyncio
 import os
-from typing import Any
 
 from headless.ext.picqer import Client
 from headless.ext.picqer import PurchaseOrder
 
 
 async def main():
-    params: dict[str, Any]  = {
-        'api_key': os.environ['MOLANO_PICQER_API_KEY'],
+    params = {
+        'api_key': os.environ['PICQER_API_KEY'],
         'api_email': 'test@headless.python.dev.unimatrixone.io',
-        'api_url': 'https://molano.picqer.com/api'
+        'api_url': os.environ['PICQER_API_URL']
     }
     async with Client(**params) as client:
         orders: list[PurchaseOrder] = [x async for x in client.list(PurchaseOrder)]
-        assert orders
-        assert orders[0].idsupplier is not None
+        if not orders:
+            print("You needs at least one purchase order for this example to work.")
+            raise SystemExit
         order = orders[0]
 
         # Before awaiting, the attribute contains a wrapper.

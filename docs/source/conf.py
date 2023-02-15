@@ -66,7 +66,7 @@ html_theme_options = {
     'base_url': 'https://gitlab.com/unimatrixone/libraries/python-unimatrix/headless',
     'color_primary': 'blue',
     'color_accent': 'light-blue',
-    'repo_url': 'https://gitlab.com/unimatrixone/libraries/python-unimatrix/headless',
+    'repo_url': 'https://github.com/cochiseruhulessin/python-headless',
     'repo_name': 'Headless',
     'globaltoc_depth': 2,
     'globaltoc_collapse': True,
