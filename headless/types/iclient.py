@@ -108,7 +108,12 @@ class IClient(Generic[Request, Response]):
         it is rate limited. The default implementation raises an exception, but
         subclasses may override this method to return a response object.
         """
-        return await self.backoff.retry(self, response.request, response)
+        response = await self.backoff.retry(self, response.request, response)
+        if response.status_code == 429:
+            self.logger.critical(
+                "Unable to recover from rate limit (request: %s, resource: %s)",
+                response.request.id, response.request.url
+            )
 
     def process_response(self, action: str, data: dict[str, Any] | list[Any]) -> dict[str, Any]:
         """Hook to transform response data."""

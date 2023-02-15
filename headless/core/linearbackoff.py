@@ -40,13 +40,13 @@ class LinearBackoff(IBackoff):
         request: IRequest[Any],
         response: IResponse[Any, Any]
     ) -> IResponse[Any, Any]:
-        self.logger.critical(
+        self.logger.warning(
             'Client was rate limited (request: %s, resource: %s)',
             request.id, request.url
         )
         for _ in range(self.max_retries):
             interval = self.parse_retry_after(response)
-            self.logger.critical(
+            self.logger.debug(
                 "Waiting %s seconds to retry rate limited request "
                 "(request: %s, resource: %s)",
                 interval, request.id, request.url
