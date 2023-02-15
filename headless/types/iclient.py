@@ -42,6 +42,36 @@ class IClient(Generic[Request, Response]):
         await (credential or self.credential).add_to_request(request)
         return await self.send(request)
 
+    async def retrieve(self, model: type[M], resource_id: int | str) -> M:
+        """Discover the API endpoint using the class configuration
+        and retrieve a single instance using the HTTP GET verb.
+        """
+        response = await self.request(
+            method='GET',
+            url=model._meta.get_retrieve_url(resource_id) # type: ignore
+        )
+        response.raise_for_status()
+
+        # TODO: Abstract this to a separate class.
+        if response.headers.get('Content-Type') != 'application/json':
+            raise TypeError(
+                'Invalid response content type: '
+                '{response.headers.get("Content-Type")}'
+            )
+        data = self.process_response('retrieve', await response.json())
+        data = model.process_response('retrieve', data)
+        resource = model.parse_obj(data)
+        resource._client = self # type: ignore
+        return resource
+
+    def process_response(self, action: str, data: dict[str, Any]) -> dict[str, Any]:
+        """Hook to transform response data."""
+        return data
+
+    async def _request_factory(self, *args: Any, **kwargs: Any) -> IRequest[Request]:
+        request = await self.request_factory(*args, **kwargs)
+        return self.request_class.fromimpl(request)
+
     async def request_factory(
         self,
         method: str,
@@ -51,13 +81,6 @@ class IClient(Generic[Request, Response]):
 
     async def send(self, request: IRequest[Request]) -> IResponse[Request, Response]:
         raise NotImplementedError
-
-    async def retrieve(self, model: type[M], resource_id: int | str) -> M:
-        raise NotImplementedError
-
-    async def _request_factory(self, *args: Any, **kwargs: Any) -> IRequest[Request]:
-        request = await self.request_factory(*args, **kwargs)
-        return self.request_class.fromimpl(request)
 
     async def __aenter__(self: T) -> T:
         raise NotImplementedError

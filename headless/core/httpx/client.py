@@ -38,27 +38,6 @@ class Client(IClient[httpx.Request, httpx.Response]):
             url=url
         )
 
-    async def retrieve(self, model: type[R], resource_id: int | str) -> R:
-        """Discover the API endpoint using the class configuration
-        and retrieve a single instance using the HTTP GET verb.
-        """
-        response = await self.request(
-            method='GET',
-            url=model._meta.get_retrieve_url(resource_id) # type: ignore
-        )
-        response.raise_for_status()
-
-        # TODO: Abstract this to a separate class.
-        if response.headers.get('Content-Type') != 'application/json':
-            raise TypeError(
-                'Invalid response content type: '
-                '{response.headers.get("Content-Type")}'
-            )
-        data = model.process_response('retrieve', await response.json())
-        resource = model.parse_obj(data)
-        resource._client = self # type: ignore
-        return resource
-
     async def send(self, request: Request) -> Response: # type: ignore
         return Response.fromimpl(request, await self._client.send(request.impl))
 
