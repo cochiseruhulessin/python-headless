@@ -17,6 +17,7 @@ from .irequest import IRequest
 from .nullbackoff import NullBackoff
 from .nullcredential import NullCredential
 from .ratelimited import RateLimited
+from .serverdoesnotexist import ServerDoesNotExist
 
 
 __all__: list[str] = [
@@ -31,4 +32,5 @@ __all__: list[str] = [
     'NullBackoff',
     'NullCredential',
     'RateLimited',
+    'ServerDoesNotExist'
 ]

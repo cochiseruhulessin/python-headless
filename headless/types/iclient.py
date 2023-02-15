@@ -83,7 +83,12 @@ class IClient(Generic[Request, Response]):
             json=json
         )
         await (credential or self.credential).add_to_request(request)
-        response = await self.send(request)
+        try:
+            response = await self.send(request)
+        except Exception as exc:
+            response = await request.on_failure(exc, self)
+            if response is None:
+                raise
         if response.status_code == 429:
             response = await self.on_rate_limited(response)
         return response

@@ -12,15 +12,15 @@ from .irequest import IRequest
 from .iresponse import IResponse
 
 
-class RateLimited(Exception):
+class ServerDoesNotExist(Exception):
+    """Raised when a server does not exist i.e. the hostname did not
+    resolve when performing a DNS lookup.
+    """
     __module__: str = 'headless.types'
     request: IRequest[Any]
-    response: IResponse[Any, Any]
 
     def __init__(
         self,
         request: IRequest[Any],
-        response: IResponse[Any, Any]
     ):
         self.request = request
-        self.response = response

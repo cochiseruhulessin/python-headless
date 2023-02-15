@@ -23,7 +23,7 @@ async def main():
     }
     async with Client(**params) as client:
         requests: list[Awaitable[User]] = []
-        for _ in range(512):
+        for _ in range(600):
             requests.append(client.retrieve(User, 13631))
         await asyncio.gather(*requests)
 

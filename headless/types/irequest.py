@@ -10,6 +10,10 @@ import uuid
 from typing import Any
 from typing import Generic
 from typing import TypeVar
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .iclient import IClient
 
 W = TypeVar('W')
 Request = TypeVar('Request')
@@ -45,6 +49,13 @@ class IRequest(Generic[Request]):
 
     def get_url(self) -> str:
         raise NotImplementedError
+
+    async def on_failure(
+        self,
+        exc: BaseException,
+        client: 'IClient[Any, Any]'
+    ) -> Any | None:
+        return None
 
     async def retry(self) -> Any:
         pass
