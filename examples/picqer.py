@@ -22,11 +22,8 @@ async def main():
         'api_url': 'https://molano.picqer.com/api',
     }
     async with Client(**params) as client:
-        print(repr(await client.retrieve(User, 13631)))
-        print(repr(await client.retrieve(Warehouse, 6790)))
-        order = await client.retrieve(PurchaseOrder, 1503164)
-        print(order)
-        print(await order.get_purchaser())
+        for obj in await client.list(User):
+            print(f'{obj.emailaddress} {obj.firstname}')
 
 
 if __name__ == '__main__':

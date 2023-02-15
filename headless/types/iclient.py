@@ -10,6 +10,7 @@ from typing import Any
 from typing import Generic
 from typing import TypeVar
 
+from .headers import Headers
 from .icredential import ICredential
 from .iresponse import IResponse
 from .irequest import IRequest
@@ -28,6 +29,14 @@ class IClient(Generic[Request, Response]):
     credential: ICredential = NullCredential()
     request_class: type[IRequest[Request]]
     response_class: type[IResponse[Request, Response]]
+
+    def check_json(self, headers: Headers):
+        # TODO: Abstract this to a separate class.
+        if headers.get('Content-Type') != 'application/json':
+            raise TypeError(
+                'Invalid response content type: '
+                '{response.headers.get("Content-Type")}'
+            )
 
     async def request(
         self,
@@ -51,22 +60,18 @@ class IClient(Generic[Request, Response]):
             url=model._meta.get_retrieve_url(resource_id) # type: ignore
         )
         response.raise_for_status()
-
-        # TODO: Abstract this to a separate class.
-        if response.headers.get('Content-Type') != 'application/json':
-            raise TypeError(
-                'Invalid response content type: '
-                '{response.headers.get("Content-Type")}'
-            )
+        self.check_json(response.headers)
         data = self.process_response('retrieve', await response.json())
-        data = model.process_response('retrieve', data)
-        resource = model.parse_obj(data)
-        resource._client = self # type: ignore
-        return resource
+        return self.resource_factory(model, 'retrieve', data)
 
-    def process_response(self, action: str, data: dict[str, Any]) -> dict[str, Any]:
+    def process_response(self, action: str, data: dict[str, Any] | list[Any]) -> dict[str, Any]:
         """Hook to transform response data."""
         return data
+
+    def resource_factory(self, model: type[M], action, data: dict[str, Any]) -> M:
+        resource = model.parse_obj(model.process_response(action, data))
+        resource._client = self # type: ignore
+        return resource
 
     async def _request_factory(self, *args: Any, **kwargs: Any) -> IRequest[Request]:
         request = await self.request_factory(*args, **kwargs)
@@ -87,3 +92,19 @@ class IClient(Generic[Request, Response]):
 
     async def __aexit__(self, cls: type[BaseException], *args: Any) -> bool | None:
         raise NotImplementedError
+
+    async def list(self, model: type[M]) -> list[M]:
+        """Discover the API endpoint using the class configuration
+        and retrieve a list of instances using the HTTP GET verb.
+        """
+        response = await self.request(
+            method='GET',
+            url=model._meta.get_list_url()
+        )
+        response.raise_for_status()
+        self.check_json(response.headers)
+        data = self.process_response('list', await response.json())
+        return [
+            self.resource_factory(model, 'list', x)
+            for x in data
+        ]

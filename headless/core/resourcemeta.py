@@ -37,3 +37,10 @@ class ResourceMeta:
         that is configured with a client instance.
         """
         return f'{self.base_endpoint}/{resource_id}'
+
+    def get_list_url(self) -> str:
+        """Return the URL to retrieve a list of instances of the
+        resource. This is a relative URL to the API base endpoint
+        that is configured with a client instance.
+        """
+        return self.base_endpoint
