@@ -48,7 +48,7 @@ class DeferredResource:
     def __getattr__(self, attname: str) -> Any:
         if self.__instance is not None:
             return getattr(self.__instance, attname)
-        raise Exception(
+        raise RuntimeError(
             f'To access {self.__parent.__name__}.{self.__attname} it must '
             'first be awaited.'
         )
