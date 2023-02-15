@@ -28,10 +28,10 @@ class Client(IClient[httpx.Request, httpx.Response]):
     response_class: type[Response] = Response
     request_class: type[Request] = Request
 
-    def __init__(self, *, credential: ICredential | None = None, **kwargs: Any):
+    def __init__(self, *, base_url: str, credential: ICredential | None = None, **kwargs: Any):
         self.credential = credential or self.credential
         self.params = kwargs
-        self._client = httpx.AsyncClient(**kwargs)
+        self._client = httpx.AsyncClient(base_url=base_url, **kwargs)
 
     async def request_factory(
         self,

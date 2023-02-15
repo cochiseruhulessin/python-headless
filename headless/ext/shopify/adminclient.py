@@ -26,12 +26,12 @@ class AdminClient(httpx.Client):
         **kwargs: Any
     ):
         kwargs.setdefault('credential', ShopifyCredential(access_token))
-        kwargs.setdefault(
-            'base_url',
-            f'https://{domain}/admin/api'
-        )
         headers = kwargs.setdefault('headers', {})
         headers.update({
             'Accept': 'application/json'
         })
-        super().__init__(*args, **kwargs)
+        super().__init__(
+            base_url=f'https://{domain}/admin/api',
+            *args,
+            **kwargs
+        )

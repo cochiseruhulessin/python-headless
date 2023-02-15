@@ -1,4 +1,3 @@
-=============================================
 Headless - Asynchronous HTTP client framework
 =============================================
 
@@ -74,15 +73,93 @@ Traversing the resource hierarchy
    :lines: 9-
 
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+Building your own client
+========================
+It is likely that the :mod:`headless` extensions library does not contain a
+client for your service. But no worries, implementing your custom client
+consist of only three easy steps, that will get your started in *minutes*.
+
+The examples below implement a fictional API that provides ``Author``
+and ``Book`` resources.
+
+Define your resources
+---------------------
+A resource is a structured object that is returned from a specific endpoint
+exposed by a service through its API. A resource schema is described using Python
+classes, by subclassing :class:`headless.core.Resource`.
+
+Each implementation **must** declare an inner ``Meta`` class that declares the
+``base_endpoint`` attribute. This attribute is used by :mod:`headless` to
+dynamically construct the API endpoints through which operations on the
+resource may be performed, such as creating, retrieving or listing.
+
+.. code:: python
+
+   from headless.core import Resource
 
 
+   class AuthorResource(Resource):
+      id: int
+      name: str
 
-Indices and tables
-==================
+      class Meta:
+         base_endpoint: str = '/v1/authors'
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+
+   class BookResource(Resource):
+      id: int
+      title: str
+      authors: list[AuthorResource]
+
+      class Meta:
+         base_endpoint: str = '/v1/books'
+
+
+Implement authentication
+------------------------
+Most APIs have some sort of authentication. To quickly, but consistently, implement
+authentication procedures that are compatible with :mod:`headless`, a helper class
+is provided: :class:`headless.types.ICredential`.
+
+All an implementation has to do is to override
+:meth:`headless.types.ICredential.add_to_request`,
+which must then add the credentials to a request.
+
+.. code:: python
+
+   from typing import Any
+
+   from headless.types import ICredential
+   from headless.types import IRequest
+
+
+   class AccessTokenCredential(ICredential):
+         token: str
+
+         def __init__(self, token: str):
+               self.token = token
+
+         # Note that ICredential.add_to_request() is an async method.
+         async def add_to_request(self, request: IRequest[Any]) -> None:
+               request.add_header('Authorization', f'Bearer {self.token}')
+
+
+Using your client
+-----------------
+
+
+.. code:: python
+
+   from headless.core.httpx import Client
+
+
+   client = Client(
+         base_url='https://api.example.com',
+         credential=AccessTokenCredential('access token')
+   )
+   async with client:
+      # Get all Books.
+      await client.listall(Book)
+
+      # Get a single book.
+      await client.retrieve(Book, 1)
