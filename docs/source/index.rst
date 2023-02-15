@@ -28,7 +28,7 @@ module is:
   details of asynchronous code. Define your resource models and you're
   ready to go!
 - Robust, because using :mod:`headless` leads to a significant reduction
-  in production incidents.
+  of production incidents.
 
 
 Getting started
