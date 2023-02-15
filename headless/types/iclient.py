@@ -21,6 +21,7 @@ import pydantic
 from .headers import Headers
 from .ibackoff import IBackoff
 from .icredential import ICredential
+from .ratelimited import RateLimited
 from .iresource import IResource
 from .iresponse import IResponse
 from .irequest import IRequest
@@ -114,6 +115,8 @@ class IClient(Generic[Request, Response]):
                 "Unable to recover from rate limit (request: %s, resource: %s)",
                 response.request.id, response.request.url
             )
+            raise RateLimited(request=response.request, response=response)
+        return response
 
     def process_response(self, action: str, data: dict[str, Any] | list[Any]) -> dict[str, Any]:
         """Hook to transform response data."""

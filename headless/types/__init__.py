@@ -16,6 +16,7 @@ from .iresource import IResource
 from .irequest import IRequest
 from .nullbackoff import NullBackoff
 from .nullcredential import NullCredential
+from .ratelimited import RateLimited
 
 
 __all__: list[str] = [
@@ -29,4 +30,5 @@ __all__: list[str] = [
     'IRequest',
     'NullBackoff',
     'NullCredential',
+    'RateLimited',
 ]
