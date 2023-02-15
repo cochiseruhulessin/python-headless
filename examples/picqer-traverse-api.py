@@ -33,6 +33,10 @@ async def main():
         await order.supplier
         print(repr(order.supplier))
 
+        # Resource objects can also be awaited so that you dont have
+        # to check if the attribute was already fetched.
+        print(repr(await order.supplier))
+
 
 
 if __name__ == '__main__':
