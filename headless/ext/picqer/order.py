@@ -12,6 +12,7 @@ from headless.core import Resource
 from .orderfield import OrderField
 from .orderproduct import OrderProduct
 from .pickuppointdata import PickupPointData
+from .picklist import Picklist
 from .tag import Tag
 
 
@@ -55,7 +56,7 @@ class Order(Resource):
     language: str | None
     products: list[OrderProduct]
     pricelists: list[int] = []
-    # picklists
+    picklists: list[Picklist] = []
 
     # Not documented in resource
     orderfields: list[OrderField] = []

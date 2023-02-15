@@ -21,9 +21,10 @@ async def main():
     }
     async with Client(**params) as client:
         for order in await client.list(Order):
-            if not order.orderfields:
+            if not order.picklists or not order.picklists[0].products:
                 continue
-            print(repr(order))
+            breakpoint()
+            break
 
 
 

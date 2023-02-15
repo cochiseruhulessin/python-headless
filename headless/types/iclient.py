@@ -6,13 +6,19 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inspect
+from collections.abc import Iterable
+from collections.abc import Mapping
 from typing import Any
 from typing import Generic
 from typing import NoReturn
 from typing import TypeVar
 
+import pydantic
+
 from .headers import Headers
 from .icredential import ICredential
+from .iresource import IResource
 from .iresponse import IResponse
 from .irequest import IRequest
 from .nullcredential import NullCredential
@@ -84,12 +90,8 @@ class IClient(Generic[Request, Response]):
 
     def resource_factory(self, model: type[M], action, data: dict[str, Any]) -> M:
         resource = model.parse_obj(model.process_response(action, data))
-        resource._client = self # type: ignore
+        self._inject_client(resource)
         return resource
-
-    async def _request_factory(self, *args: Any, **kwargs: Any) -> IRequest[Request]:
-        request = await self.request_factory(*args, **kwargs)
-        return self.request_class.fromimpl(request)
 
     async def request_factory(
         self,
@@ -106,6 +108,25 @@ class IClient(Generic[Request, Response]):
 
     async def __aexit__(self, cls: type[BaseException], *args: Any) -> bool | None:
         raise NotImplementedError
+
+    def _inject_client(self, resource: pydantic.BaseModel):
+        # Traverse the object hierarchy and add the client to each implementation
+        # of IResource.
+        resource._client = self
+        for attname, field in resource.__fields__.items():
+            if not inspect.isclass(field.type_)\
+            or not issubclass(field.type_, IResource):
+                continue
+            value = getattr(resource, attname)
+            if isinstance(value, Iterable):
+                if isinstance(value, Mapping):
+                    value = list(value.values())
+                for subresource in value:
+                    self._inject_client(subresource)
+
+    async def _request_factory(self, *args: Any, **kwargs: Any) -> IRequest[Request]:
+        request = await self.request_factory(*args, **kwargs)
+        return self.request_class.fromimpl(request)
 
     async def list(self, model: type[M]) -> list[M]:
         """Discover the API endpoint using the class configuration

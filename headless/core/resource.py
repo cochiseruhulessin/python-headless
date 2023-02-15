@@ -12,6 +12,7 @@ from typing import TypeVar
 import pydantic
 
 from headless.types import IClient
+from headless.types import IResource
 from .resourcemeta import ResourceMeta
 from .resourcemetaclass import ResourceMetaclass
 
@@ -21,7 +22,7 @@ Request = TypeVar('Request')
 Response = TypeVar('Response')
 
 
-class Resource(pydantic.BaseModel, metaclass=ResourceMetaclass):
+class Resource(IResource, metaclass=ResourceMetaclass):
     """The base class for all resource implementations."""
     __abstract__: bool = True
     _client: IClient[Any, Any] = pydantic.PrivateAttr()

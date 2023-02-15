@@ -11,6 +11,7 @@ from .headers import Headers
 from .iclient import IClient
 from .icredential import ICredential
 from .iresponse import IResponse
+from .iresource import IResource
 from .irequest import IRequest
 from .nullcredential import NullCredential
 
@@ -20,6 +21,7 @@ __all__: list[str] = [
     'Headers',
     'IClient',
     'ICredential',
+    'IResource',
     'IResponse',
     'IRequest',
     'NullCredential',
