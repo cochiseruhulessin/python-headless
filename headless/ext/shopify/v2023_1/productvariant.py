@@ -6,11 +6,16 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from .order import Order
-from .product import Product
+from ..resource import ShopifyResource
 
 
-__all__: list[str] = [
-    'Order',
-    'Product',
-]
+class ProductVariant(ShopifyResource):
+    id: int
+    product_id: int
+    sku: str
+    title: str
+
+    class Meta:
+        base_endpoint: str = '/2023-01/products/{0}/variants'
+        name: str = 'variant'
+        pluralname: str = 'variants'

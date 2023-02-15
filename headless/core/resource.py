@@ -29,6 +29,10 @@ class Resource(IResource, metaclass=ResourceMetaclass):
     _meta: ResourceMeta = pydantic.PrivateAttr()
 
     @classmethod
+    def get_list_url(cls, *params: Any) -> str:
+        return cls._meta.get_list_url()
+
+    @classmethod
     def process_response(cls, action: str, data: dict[str, Any]) -> dict[str, Any]:
         """Process response data prior to parsing using the declared model."""
         return data

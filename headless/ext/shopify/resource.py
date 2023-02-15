@@ -14,6 +14,13 @@ class ShopifyResource(Resource):
     __abstract__: bool = True
 
     @classmethod
+    def get_list_url(cls, *params: Any) -> str:
+        url = super().get_list_url(*params) + '.json'
+        if params:
+            url = url.format(*params)
+        return url
+
+    @classmethod
     def process_response(
         cls,
         action: str,
@@ -23,4 +30,8 @@ class ShopifyResource(Resource):
             k = cls._meta.pluralname
         elif action in {'retrieve'}:
             k = cls._meta.name
+        elif action is None:
+            return data
+        else:
+            raise NotImplementedError
         return data[str.lower(k)]

@@ -12,6 +12,7 @@ from collections.abc import Iterable
 from collections.abc import Mapping
 from typing import Any
 from typing import Generic
+from typing import Generator
 from typing import NoReturn
 from typing import TypeVar
 
@@ -134,7 +135,28 @@ class IClient(Generic[Request, Response]):
         request = await self.request_factory(*args, **kwargs)
         return self.request_class.fromimpl(request)
 
-    async def list(self, model: type[M]) -> list[M]:
+    async def listall(
+        self,
+        model: type[M],
+        *params: Any
+    ) -> Generator[M, None, None]:
+        """Like :meth:`list()`, but returns all entities."""
+        response = await self.request(
+            method='GET',
+            url=model.get_list_url(*params)
+        )
+        response.raise_for_status()
+        self.check_json(response.headers)
+        data = self.process_response('list', await response.json())
+        data = model.process_response('list', data)
+        resources = [
+            self.resource_factory(model, None, x)
+            for x in data
+        ]
+        while resources:
+            yield resources.pop(0)
+
+    async def list(self, model: type[M]) -> Generator[M, None, None]:
         """Discover the API endpoint using the class configuration
         and retrieve a list of instances using the HTTP GET verb.
         """
@@ -145,7 +167,10 @@ class IClient(Generic[Request, Response]):
         response.raise_for_status()
         self.check_json(response.headers)
         data = self.process_response('list', await response.json())
-        return [
-            self.resource_factory(model, 'list', x)
+        data = model.process_response('list', data)
+        resources = [
+            self.resource_factory(model, None, x)
             for x in data
         ]
+        for resource in resources:
+            yield resource

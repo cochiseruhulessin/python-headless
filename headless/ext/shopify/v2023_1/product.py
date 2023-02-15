@@ -6,11 +6,19 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from .order import Order
-from .product import Product
+from typing import AsyncGenerator
+
+from ..resource import ShopifyResource
+from .productvariant import ProductVariant
 
 
-__all__: list[str] = [
-    'Order',
-    'Product',
-]
+class Product(ShopifyResource):
+    id: int
+    title: str
+
+    def get_variants(self) -> AsyncGenerator[ProductVariant, None]:
+        return self._client.listall(ProductVariant, self.id)
+
+
+    class Meta:
+        base_endpoint: str = '/2023-01/products'

@@ -10,10 +10,9 @@ import asyncio
 import logging
 import os
 from typing import Any
-from typing import Awaitable
 
 from headless.ext.shopify import AdminClient
-from headless.ext.shopify.v2023_1 import Order
+from headless.ext.shopify.v2023_1 import Product
 
 
 async def main():
@@ -24,12 +23,10 @@ async def main():
         'domain': os.environ['SHOPIFY_SHOP_DOMAIN']
     }
     async with AdminClient(**params) as client:
-        requests: list[Awaitable[Order]] = []
-        for _ in range(50):
-            requests.append(client.retrieve(Order, 5273119949113))
-        orders = await asyncio.gather(*requests)
-        print(orders[-1].json(indent=2))
-
+        async for product in client.listall(Product):
+            print(f'{product.title} (id: {product.id})')
+            async for variant in product.get_variants():
+                print(f'  {variant.title} (id: {variant.id}, sku: {variant.sku})')
 
 
 if __name__ == '__main__':
