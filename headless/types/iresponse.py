@@ -45,11 +45,18 @@ class IResponse(Generic[Request, Response]):
     def request(self) -> IRequest[Request]:
         return self._request
 
+    @property
+    def status_code(self) -> int:
+        return self.get_status_code()
+
     def __init__(self, request: IRequest[Request], response: Response) -> None:
         self._request = request
         self._response = response
 
     def get_headers(self) -> Headers:
+        raise NotImplementedError
+
+    def get_status_code(self) -> int:
         raise NotImplementedError
 
     async def json(self) -> Any:

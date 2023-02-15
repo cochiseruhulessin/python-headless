@@ -20,6 +20,9 @@ class Response(IResponse[httpx.Request, httpx.Response]):
     def get_headers(self) -> Headers:
         return Headers(dict(self._response.headers.items()))
 
+    def get_status_code(self) -> int:
+        return self._response.status_code
+
     async def json(self) -> Any:
         return self._response.json()
 

@@ -6,19 +6,12 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from .client import Client
-from .credential import PicqerCredential
-from .order import Order
-from .purchaseorder import PurchaseOrder
-from .user import User
-from .warehouse import Warehouse
+import pydantic
 
 
-__all__: list[str] = [
-    'Client',
-    'Order',
-    'PicqerCredential',
-    'PurchaseOrder',
-    'User',
-    'Warehouse'
-]
+class Tag(pydantic.BaseModel):
+    idtag: int
+    title: str
+    color: str
+    inherit: bool
+    text_color: str = pydantic.Field(..., alias='textColor')

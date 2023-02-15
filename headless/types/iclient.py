@@ -8,6 +8,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from typing import Any
 from typing import Generic
+from typing import NoReturn
 from typing import TypeVar
 
 from .headers import Headers
@@ -49,7 +50,10 @@ class IClient(Generic[Request, Response]):
             url=url
         )
         await (credential or self.credential).add_to_request(request)
-        return await self.send(request)
+        response = await self.send(request)
+        if response.status_code == 429:
+            response = await self.on_rate_limited(response)
+        return response
 
     async def retrieve(self, model: type[M], resource_id: int | str) -> M:
         """Discover the API endpoint using the class configuration
@@ -63,6 +67,16 @@ class IClient(Generic[Request, Response]):
         self.check_json(response.headers)
         data = self.process_response('retrieve', await response.json())
         return self.resource_factory(model, 'retrieve', data)
+
+    async def on_rate_limited(
+        self,
+        response: IResponse[Any, Any]
+    ) -> NoReturn | IResponse:
+        """Invoked when the endpoint returns a ``429`` status code, indicating that
+        it is rate limited. The default implementation raises an exception, but
+        subclasses may override this method to return a response object.
+        """
+        response.raise_for_status()
 
     def process_response(self, action: str, data: dict[str, Any] | list[Any]) -> dict[str, Any]:
         """Hook to transform response data."""

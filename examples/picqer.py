@@ -10,9 +10,7 @@ import asyncio
 import os
 
 from headless.ext.picqer import Client
-from headless.ext.picqer import PurchaseOrder
-from headless.ext.picqer import User
-from headless.ext.picqer import Warehouse
+from headless.ext.picqer import Order
 
 
 async def main():
@@ -22,8 +20,11 @@ async def main():
         'api_url': 'https://molano.picqer.com/api',
     }
     async with Client(**params) as client:
-        for obj in await client.list(User):
-            print(f'{obj.emailaddress} {obj.firstname}')
+        for order in await client.list(Order):
+            if not order.orderfields:
+                continue
+            print(repr(order))
+
 
 
 if __name__ == '__main__':
