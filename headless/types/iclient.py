@@ -7,6 +7,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inspect
+import logging
 from collections.abc import Iterable
 from collections.abc import Mapping
 from typing import Any
@@ -36,6 +37,7 @@ class IClient(Generic[Request, Response]):
     credential: ICredential = NullCredential()
     request_class: type[IRequest[Request]]
     response_class: type[IResponse[Request, Response]]
+    logger: logging.Logger = logging.getLogger('headless.client')
 
     def check_json(self, headers: Headers):
         # TODO: Abstract this to a separate class.
@@ -77,7 +79,7 @@ class IClient(Generic[Request, Response]):
     async def on_rate_limited(
         self,
         response: IResponse[Any, Any]
-    ) -> NoReturn | IResponse:
+    ) -> NoReturn | IResponse[Any, Any]:
         """Invoked when the endpoint returns a ``429`` status code, indicating that
         it is rate limited. The default implementation raises an exception, but
         subclasses may override this method to return a response object.

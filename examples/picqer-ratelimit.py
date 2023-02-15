@@ -8,20 +8,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import asyncio
 import os
+from typing import Any
+from typing import Awaitable
 
 from headless.ext.picqer import Client
-from headless.ext.picqer import Order
+from headless.ext.picqer import User
 
 
 async def main():
-    params: dict[str, str]  = {
+    params: dict[str, Any]  = {
         'api_key': os.environ['MOLANO_PICQER_API_KEY'],
         'api_email': 'test@headless.python.dev.unimatrixone.io',
         'api_url': 'https://molano.picqer.com/api',
+        'recover_ratelimit': True
     }
     async with Client(**params) as client:
-        for order in await client.list(Order):
-            print(order.orderid, order.deliveryname)
+        requests: list[Awaitable[User]] = []
+        for _ in range(512):
+            requests.append(client.retrieve(User, 13631))
+        await asyncio.gather(*requests)
 
 
 

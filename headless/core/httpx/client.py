@@ -13,6 +13,7 @@ import httpx
 
 from headless.types import IClient
 from headless.types import ICredential
+from headless.types import IRequest
 from ..resource import Resource # type: ignore
 from .request import Request
 from .response import Response
@@ -38,7 +39,7 @@ class Client(IClient[httpx.Request, httpx.Response]):
             url=url
         )
 
-    async def send(self, request: Request) -> Response: # type: ignore
+    async def send(self, request: IRequest[Any]) -> Response: # type: ignore
         return Response.fromimpl(request, await self._client.send(request.impl))
 
     async def __aenter__(self: T) -> T:
