@@ -12,7 +12,7 @@ import pydantic
 
 
 class IResource(pydantic.BaseModel):
-    __deferred__: dict[str, Any] = {}
+    __deferred__: dict[str, Any] = pydantic.PrivateAttr({})
 
     def get_persist_url(self) -> str:
         raise NotImplementedError
