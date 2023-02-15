@@ -18,7 +18,8 @@
     ],
     "httpx": [
       "httpx"
-    ]
+    ],
+    "picqer": ["httpx"]
   },
   "classifiers": [
      "Development Status :: 4 - Beta",
