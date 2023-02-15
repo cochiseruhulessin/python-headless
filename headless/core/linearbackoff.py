@@ -46,7 +46,7 @@ class LinearBackoff(IBackoff):
         )
         for _ in range(self.max_retries):
             interval = self.parse_retry_after(response)
-            self.logger.debug(
+            self.logger.critical(
                 "Waiting %s seconds to retry rate limited request "
                 "(request: %s, resource: %s)",
                 interval, request.id, request.url

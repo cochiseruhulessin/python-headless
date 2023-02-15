@@ -16,7 +16,7 @@ from .credential import ShopifyCredential
 
 class AdminClient(httpx.Client):
     recover_ratelimit: bool = False
-    backoff: IBackoff = LinearBackoff(5, 15)
+    backoff: IBackoff = LinearBackoff(5, 30)
 
     def __init__(
         self,
