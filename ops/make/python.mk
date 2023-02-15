@@ -43,6 +43,7 @@ cmd.runtests = $(PYTHON) -m pytest -v
 cmd.runtests += --cov-report term-missing:skip-covered
 cmd.runtests += --cov=$(or $(cmd.test.cover-package), $(PYTHON_PKG_NAME))
 cmd.runtests += --cov-append
+cmd.runtests += --no-cov-on-fail
 ifdef test.coverage.$(TEST_STAGE)
 cmd.runtests += --cov-fail-under=$(test.coverage.$(TEST_STAGE))
 endif
