@@ -13,7 +13,6 @@ from .credential import PicqerCredential
 
 
 class Client(httpx.Client):
-    recover_ratelimit: bool = False
     backoff: IBackoff = LinearBackoff(5, 15)
 
     def __init__(
@@ -21,9 +20,7 @@ class Client(httpx.Client):
         api_url: str,
         api_email: str,
         api_key: str,
-        recover_ratelimit: bool = False
     ):
-        self.recover_ratelimit = recover_ratelimit
         super().__init__(
             base_url=api_url,
             credential=PicqerCredential(api_email, api_key)

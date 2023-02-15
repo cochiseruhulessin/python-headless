@@ -19,8 +19,7 @@ async def main():
     params: dict[str, Any]  = {
         'api_key': os.environ['MOLANO_PICQER_API_KEY'],
         'api_email': 'test@headless.python.dev.unimatrixone.io',
-        'api_url': 'https://molano.picqer.com/api',
-        'recover_ratelimit': True
+        'api_url': 'https://molano.picqer.com/api'
     }
     async with Client(**params) as client:
         requests: list[Awaitable[User]] = []
