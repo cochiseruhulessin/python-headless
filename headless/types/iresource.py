@@ -6,10 +6,13 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+from typing import Any
+
 import pydantic
 
 
 class IResource(pydantic.BaseModel):
+    __deferred__: dict[str, Any] = {}
 
     def get_persist_url(self) -> str:
         raise NotImplementedError

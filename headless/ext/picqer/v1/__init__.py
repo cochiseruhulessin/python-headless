@@ -9,6 +9,7 @@
 from .order import Order
 from .picklist import Picklist
 from .purchaseorder import PurchaseOrder
+from .supplier import Supplier
 from .user import User
 from .warehouse import Warehouse
 
@@ -16,6 +17,7 @@ __all__: list[str] = [
     'Order',
     'Picklist',
     'PurchaseOrder',
+    'Supplier',
     'User',
     'Warehouse'
 ]

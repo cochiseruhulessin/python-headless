@@ -9,7 +9,9 @@
 import datetime
 
 from headless.core import Resource
+from headless.core import Reference
 from .purchaseorderproduct import PurchaseOrderProduct
+from .supplier import Supplier
 from .user import User
 
 
@@ -37,6 +39,9 @@ class PurchaseOrder(Resource):
     updated: datetime.datetime | None = None
     purchased_by_iduser: int | None = None
     purchased_at: datetime.datetime | None = None
+
+    # Our fields
+    supplier: Supplier = Reference(Supplier, 'idsupplier')
 
     async def get_purchaser(self) -> User | None:
         return await self._client.retrieve(User, self.purchased_by_iduser)\

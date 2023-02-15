@@ -17,6 +17,7 @@ __all__: list[str] = [
     'Order',
     'Picklist',
     'PurchaseOrder',
+    'Supplier',
     'User',
     'Warehouse'
 ]

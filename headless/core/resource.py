@@ -54,3 +54,7 @@ class Resource(IResource, metaclass=ResourceMetaclass):
             instance=self
         )
         self._client = client
+
+    def __await__(self):
+        async def f(): return self
+        return f().__await__()
