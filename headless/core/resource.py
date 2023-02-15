@@ -13,6 +13,7 @@ import pydantic
 
 from headless.types import IClient
 from headless.types import IResource
+from headless.types import IResponse
 from .resourcemeta import ResourceMeta
 from .resourcemetaclass import ResourceMetaclass
 
@@ -33,6 +34,23 @@ class Resource(IResource, metaclass=ResourceMetaclass):
         return cls._meta.get_list_url()
 
     @classmethod
+    def get_next_url(
+        cls,
+        response: IResponse[Any, Any]
+    ) -> str | None:
+        """Return the next URL when paginating, or ``None`` if there is
+        no next URL.
+        """
+        raise NotImplementedError
+
+    @classmethod
     def process_response(cls, action: str, data: dict[str, Any]) -> dict[str, Any]:
         """Process response data prior to parsing using the declared model."""
         return data
+
+    async def persist(self, client: IClient[Any, Any]):
+        await client.persist(
+            model=type(self),
+            instance=self
+        )
+        self._client = client

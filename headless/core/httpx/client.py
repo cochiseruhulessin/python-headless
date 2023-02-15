@@ -33,10 +33,18 @@ class Client(IClient[httpx.Request, httpx.Response]):
         self.params = kwargs
         self._client = httpx.AsyncClient(**kwargs)
 
-    async def request_factory(self, method: str, url: str) -> httpx.Request:
+    async def request_factory(
+        self,
+        method: str,
+        url: str,
+        json: list[Any] | dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None
+    ) -> httpx.Request:
         return self._client.build_request(
             method=method,
-            url=url
+            url=url,
+            json=json,
+            headers=headers
         )
 
     async def send(self, request: IRequest[Any]) -> Response: # type: ignore

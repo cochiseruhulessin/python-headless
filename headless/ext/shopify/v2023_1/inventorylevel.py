@@ -6,10 +6,20 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import pydantic
+from ..resource import ShopifyResource
 
 
-class IResource(pydantic.BaseModel):
+class InventoryLevel(ShopifyResource):
+    available: int
+    inventory_item_id: int
+    location_id: int
+    disconnect_if_necessary: bool = False
 
     def get_persist_url(self) -> str:
-        raise NotImplementedError
+        return f'{self._meta.base_endpoint}/set.json'
+
+    class Meta:
+        base_endpoint: str = '/2023-01/inventory_levels'
+        name: str = 'inventory_level'
+        persist_method: str = 'POST'
+        pluralname: str = 'inventory_levels'

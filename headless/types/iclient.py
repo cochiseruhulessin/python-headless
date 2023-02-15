@@ -30,7 +30,7 @@ from .nullcredential import NullCredential
 
 Request = TypeVar('Request')
 Response = TypeVar('Response')
-M = TypeVar('M')
+M = TypeVar('M', bound=IResource)
 T = TypeVar('T', bound='IClient[Any, Any]')
 
 
@@ -52,15 +52,34 @@ class IClient(Generic[Request, Response]):
                 f'{headers.get("Content-Type")}'
             )
 
+    async def persist(
+        self,
+        model: type[M],
+        instance: M
+    ) -> M:
+        response = await self.request(
+            method=model._meta.persist_method,
+            url=instance.get_persist_url(),
+            json=instance.dict()
+        )
+        response.raise_for_status()
+        return instance
+
     async def request(
         self,
         method: str,
         url: str,
-        credential: ICredential | None = None
+        credential: ICredential | None = None,
+        json: list[Any] | dict[str, Any] | None = None
     ) -> IResponse[Request, Response]:
+        headers: dict[str, str] = {}
+        if json is not None:
+            headers['Content-Type'] = 'application/json'
         request = await self._request_factory(
             method=method,
-            url=url
+            url=url,
+            headers=headers,
+            json=json
         )
         await (credential or self.credential).add_to_request(request)
         response = await self.send(request)
@@ -103,7 +122,9 @@ class IClient(Generic[Request, Response]):
     async def request_factory(
         self,
         method: str,
-        url: str
+        url: str,
+        json: list[Any] | dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None
     ) -> Request:
         raise NotImplementedError
 
@@ -138,12 +159,13 @@ class IClient(Generic[Request, Response]):
     async def listall(
         self,
         model: type[M],
-        *params: Any
+        *params: Any,
+        url: str | None = None
     ) -> Generator[M, None, None]:
         """Like :meth:`list()`, but returns all entities."""
         response = await self.request(
             method='GET',
-            url=model.get_list_url(*params)
+            url=url or model.get_list_url(*params)
         )
         response.raise_for_status()
         self.check_json(response.headers)
@@ -155,6 +177,11 @@ class IClient(Generic[Request, Response]):
         ]
         while resources:
             yield resources.pop(0)
+        url = model.get_next_url(response)
+        if url is None:
+            return
+        async for resource in self.listall(model, *params, url=url):
+            yield resource
 
     async def list(self, model: type[M]) -> Generator[M, None, None]:
         """Discover the API endpoint using the class configuration

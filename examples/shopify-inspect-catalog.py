@@ -23,10 +23,15 @@ async def main():
         'domain': os.environ['SHOPIFY_SHOP_DOMAIN']
     }
     async with AdminClient(**params) as client:
+        np = 0
+        nv = 0
         async for product in client.listall(Product):
             print(f'{product.title} (id: {product.id})')
+            np += 1
             async for variant in product.get_variants():
-                print(f'  {variant.title} (id: {variant.id}, sku: {variant.sku})')
+                print(f'  {variant.title} (id: {variant.id}, sku: {variant.sku}, inventory: {variant.inventory_item_id})')
+                nv += 1
+        print(f'{np} Products and {nv} ProductVariants')
 
 
 if __name__ == '__main__':

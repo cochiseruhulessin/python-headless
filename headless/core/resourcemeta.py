@@ -18,6 +18,7 @@ class ResourceMeta:
     __module__: str = 'headless.core'
     base_endpoint: str
     name: str
+    persist_method: str
     pluralname: str
 
     @classmethod
@@ -29,7 +30,8 @@ class ResourceMeta:
         params['base_endpoint'] = base_endpoint = getattr(meta, 'base_endpoint', None)
         params.update({
             'name': getattr(meta, 'name', name),
-            'pluralname': getattr(meta, 'pluralname', engine.plural_noun(name))
+            'pluralname': getattr(meta, 'pluralname', engine.plural_noun(name)),
+            'persist_method': getattr(meta, 'persist_method', 'PUT')
         })
         if base_endpoint is None:
             raise TypeError(f'{meta.__name__}.base_endpoint is not defined.')
@@ -42,11 +44,13 @@ class ResourceMeta:
     def __init__(
         self,
         name: str,
+        persist_method: str,
         pluralname: str,
         base_endpoint: str
     ):
         self.base_endpoint = base_endpoint
         self.name = name
+        self.persist_method = persist_method
         self.pluralname = pluralname
 
     def get_retrieve_url(self, resource_id: int | str) -> str:
