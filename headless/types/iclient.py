@@ -18,10 +18,12 @@ from typing import TypeVar
 import pydantic
 
 from .headers import Headers
+from .ibackoff import IBackoff
 from .icredential import ICredential
 from .iresource import IResource
 from .iresponse import IResponse
 from .irequest import IRequest
+from .nullbackoff import NullBackoff
 from .nullcredential import NullCredential
 
 
@@ -34,6 +36,7 @@ T = TypeVar('T', bound='IClient[Any, Any]')
 class IClient(Generic[Request, Response]):
     """Specifies the interface for all API client implementations."""
     __module__: str = 'headless.types'
+    backoff: IBackoff = NullBackoff()
     credential: ICredential = NullCredential()
     request_class: type[IRequest[Request]]
     response_class: type[IResponse[Request, Response]]
@@ -84,7 +87,7 @@ class IClient(Generic[Request, Response]):
         it is rate limited. The default implementation raises an exception, but
         subclasses may override this method to return a response object.
         """
-        response.raise_for_status()
+        return await self.backoff.retry(self, response.request, response)
 
     def process_response(self, action: str, data: dict[str, Any] | list[Any]) -> dict[str, Any]:
         """Hook to transform response data."""

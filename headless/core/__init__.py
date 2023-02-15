@@ -6,12 +6,14 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+from .linearbackoff import LinearBackoff
 from .resource import Resource # type: ignore
 from .resourcemeta import ResourceMeta
 from .resourcemetaclass import ResourceMetaclass
 
 
 __all__: list[str] = [
+    'LinearBackoff',
     'Resource',
     'ResourceMeta',
     'ResourceMetaclass',

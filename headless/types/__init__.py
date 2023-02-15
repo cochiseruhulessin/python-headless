@@ -8,21 +8,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from .basicauth import BasicAuth
 from .headers import Headers
+from .ibackoff import IBackoff
 from .iclient import IClient
 from .icredential import ICredential
 from .iresponse import IResponse
 from .iresource import IResource
 from .irequest import IRequest
+from .nullbackoff import NullBackoff
 from .nullcredential import NullCredential
 
 
 __all__: list[str] = [
     'BasicAuth',
     'Headers',
+    'IBackoff',
     'IClient',
     'ICredential',
     'IResource',
     'IResponse',
     'IRequest',
+    'NullBackoff',
     'NullCredential',
 ]

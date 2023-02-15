@@ -6,6 +6,8 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import uuid
+from typing import Any
 from typing import Generic
 from typing import TypeVar
 
@@ -23,11 +25,26 @@ class IRequest(Generic[Request]):
         return cls(request)
 
     @property
+    def id(self) -> str:
+        return self._id
+
+    @property
     def impl(self) -> Request:
         return self._request
 
+    @property
+    def url(self) -> str:
+        return self.get_url()
+
     def __init__(self, request: Request) -> None:
+        self._id = str(uuid.uuid4())
         self._request = request
 
     def add_header(self, name: str, value: str) -> None:
         raise NotImplementedError
+
+    def get_url(self) -> str:
+        raise NotImplementedError
+
+    async def retry(self) -> Any:
+        pass
