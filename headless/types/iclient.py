@@ -43,6 +43,7 @@ class IClient(Generic[Request, Response]):
     request_class: type[IRequest[Request]]
     response_class: type[IResponse[Request, Response]]
     logger: logging.Logger = logging.getLogger('headless.client')
+    user_agent: str = 'Headless'
 
     def check_json(self, headers: Headers):
         # TODO: Abstract this to a separate class.
@@ -62,9 +63,15 @@ class IClient(Generic[Request, Response]):
     async def get(
         self,
         url: str,
-        credential: ICredential | None = None
+        credential: ICredential | None = None,
+        params: dict[str, Any] | None = None
     ) -> IResponse[Request, Response]:
-        return await self.request(url, credential=credential)
+        return await self.request(
+            method='GET',
+            url=url,
+            credential=credential,
+            params=params
+        )
 
     async def persist(
         self,
@@ -84,9 +91,11 @@ class IClient(Generic[Request, Response]):
         method: str,
         url: str,
         credential: ICredential | None = None,
-        json: list[Any] | dict[str, Any] | None = None
+        json: list[Any] | dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None
     ) -> IResponse[Request, Response]:
         headers: dict[str, str] = {}
+        headers.setdefault('User-Agent', self.user_agent)
         if json is not None:
             headers['Content-Type'] = 'application/json'
         request = await self._request_factory(
@@ -113,10 +122,7 @@ class IClient(Generic[Request, Response]):
         if isinstance(model, str):
             raise NotImplementedError
         meta = model.get_meta()
-        response = await self.request(
-            method='GET',
-            url=meta.get_retrieve_url(resource_id)
-        )
+        response = await self.get(url=meta.get_retrieve_url(resource_id))
         response.raise_for_status()
         self.check_json(response.headers)
         data = self.process_response('retrieve', await response.json())
