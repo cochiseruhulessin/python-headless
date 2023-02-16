@@ -53,6 +53,12 @@ class IClient(Generic[Request, Response]):
                 f'{headers.get("Content-Type")}'
             )
 
+    def in_context(self) -> bool:
+        """Return a boolean indicating if the client is current used as a
+        context manager.
+        """
+        raise NotImplementedError
+
     async def persist(
         self,
         model: type[M],
