@@ -25,9 +25,13 @@ class IResource(pydantic.BaseModel):
         return cls._meta
 
     @classmethod
+    def get_list_url(cls, *params: Any) -> str:
+        return cls._meta.get_list_url()
+
+    @classmethod
     def get_retrieve_url(
         cls: type[T],
-        resource_id: str
+        resource_id: int | str | None
     ) -> str:
         raise NotImplementedError
 

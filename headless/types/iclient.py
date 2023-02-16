@@ -60,18 +60,11 @@ class IClient(Generic[Request, Response]):
         """
         raise NotImplementedError
 
-    async def get(
-        self,
-        url: str,
-        credential: ICredential | None = None,
-        params: dict[str, Any] | None = None
-    ) -> IResponse[Request, Response]:
-        return await self.request(
-            method='GET',
-            url=url,
-            credential=credential,
-            params=params
-        )
+    async def get(self, **kwargs: Any) -> IResponse[Request, Response]:
+        return await self.request(method='GET', **kwargs)
+
+    async def post(self, **kwargs: Any) -> IResponse[Request, Response]:
+        return await self.request(method='POST', **kwargs)
 
     async def persist(
         self,
@@ -102,7 +95,8 @@ class IClient(Generic[Request, Response]):
             method=method,
             url=url,
             headers=headers,
-            json=json
+            json=json,
+            params=params
         )
         await (credential or self.credential).add_to_request(request)
         try:
@@ -115,14 +109,13 @@ class IClient(Generic[Request, Response]):
             response = await self.on_rate_limited(response)
         return response
 
-    async def retrieve(self, model: type[M] | str, resource_id: int | str) -> M:
+    async def retrieve(self, model: type[M] | str, resource_id: int | str | None = None) -> M:
         """Discover the API endpoint using the class configuration
         and retrieve a single instance using the HTTP GET verb.
         """
         if isinstance(model, str):
             raise NotImplementedError
-        meta = model.get_meta()
-        response = await self.get(url=meta.get_retrieve_url(resource_id))
+        response = await self.get(url=model.get_retrieve_url(resource_id))
         response.raise_for_status()
         self.check_json(response.headers)
         data = self.process_response('retrieve', await response.json())
@@ -145,7 +138,11 @@ class IClient(Generic[Request, Response]):
             raise RateLimited(request=response.request, response=response)
         return response
 
-    def process_response(self, action: str, data: dict[str, Any] | list[Any]) -> dict[str, Any]:
+    def process_response(
+        self,
+        action: str,
+        data: dict[str, Any] | list[Any]
+    ) -> dict[str, Any]:
         """Hook to transform response data."""
         return data
 
@@ -159,7 +156,8 @@ class IClient(Generic[Request, Response]):
         method: str,
         url: str,
         json: list[Any] | dict[str, Any] | None = None,
-        headers: dict[str, str] | None = None
+        headers: dict[str, str] | None = None,
+        params: dict[str, Any] | None = None
     ) -> Request:
         raise NotImplementedError
 
@@ -169,7 +167,7 @@ class IClient(Generic[Request, Response]):
     async def __aenter__(self: T) -> T:
         raise NotImplementedError
 
-    async def __aexit__(self, cls: type[BaseException], *args: Any) -> bool | None:
+    async def __aexit__(self, cls: type[BaseException] | None, *args: Any) -> bool | None:
         raise NotImplementedError
 
     def _inject_client(self, resource: pydantic.BaseModel):
@@ -188,7 +186,10 @@ class IClient(Generic[Request, Response]):
                     self._inject_client(subresource)
 
     async def _request_factory(self, *args: Any, **kwargs: Any) -> IRequest[Request]:
-        request = await self.request_factory(*args, **kwargs)
+        request = await self.request_factory(
+            *args,
+            **(await self.credential.preprocess_request(**kwargs))
+        )
         return self.request_class.fromimpl(request)
 
     async def listall(
@@ -224,11 +225,12 @@ class IClient(Generic[Request, Response]):
         """
         response = await self.request(
             method='GET',
-            url=model._meta.get_list_url()
+            url=model.get_list_url()
         )
         response.raise_for_status()
         self.check_json(response.headers)
         data = self.process_response('list', await response.json())
+        if inspect.isawaitable(data): data = await data
         data = model.process_response('list', data)
         resources = [
             self.resource_factory(model, None, x)

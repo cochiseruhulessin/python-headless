@@ -42,13 +42,15 @@ class Client(IClient[httpx.Request, httpx.Response]):
         method: str,
         url: str,
         json: list[Any] | dict[str, Any] | None = None,
-        headers: dict[str, str] | None = None
+        headers: dict[str, str] | None = None,
+        params: dict[str, Any] | None = None
     ) -> httpx.Request:
         return self._client.build_request(
             method=method,
             url=url,
             json=json,
-            headers=headers
+            headers=headers,
+            params=params
         )
 
     async def send(self, request: IRequest[Any]) -> Response: # type: ignore
@@ -60,7 +62,7 @@ class Client(IClient[httpx.Request, httpx.Response]):
             self._in_context = True
         return self
 
-    async def __aexit__(self, cls: type[BaseException], *args: Any) -> bool | None:
+    async def __aexit__(self, cls: type[BaseException] | None, *args: Any) -> bool | None:
         if self.in_context():
             self._in_context = False
             await self._client.__aexit__(cls, *args)

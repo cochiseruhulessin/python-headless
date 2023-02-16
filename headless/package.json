@@ -11,9 +11,11 @@
   "extras_require": {
     "all": [
       "aiohttp",
+      "fastapi",
       "httpx",
       "lxml",
-      "pydantic"
+      "pydantic",
+      "uvicorn"
     ],
     "aiohttp": [
       "aiohttp"

@@ -57,11 +57,13 @@ class ResourceMeta:
         self.persist_method = persist_method
         self.pluralname = pluralname
 
-    def get_retrieve_url(self, resource_id: int | str) -> str:
+    def get_retrieve_url(self, resource_id: int | str | None) -> str:
         """Return the URL to retrieve a single instance of the
         resource. This is a relative URL to the API base endpoint
         that is configured with a client instance.
         """
+        if resource_id is None:
+            raise TypeError("The `resource_id` parameter can not be None.")
         return f'{self.base_endpoint}/{resource_id}'
 
     def get_list_url(self) -> str:

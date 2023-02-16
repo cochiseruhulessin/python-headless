@@ -1,4 +1,6 @@
 # Misc
+examples/oauth2-callback.py
+tests/ext/oauth2/test_system_discover_teamleader.py
 db.sqlite3
 *.sqlite3
 *.swp # vi swap files

@@ -19,12 +19,15 @@ class ICredential:
     """The base class for all HTTP credential implementations."""
     __module__: str = 'headless.types'
 
-
     async def add_to_request(self, request: IRequest[Any]) -> None:
         """Modify a :class:`Request` instance to include this
         credential.
         """
         pass
+
+    async def preprocess_request(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        """Preprocesses the parameters used to build a request."""
+        return kwargs
 
     async def preprocess_json(
         self,

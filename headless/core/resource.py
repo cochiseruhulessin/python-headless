@@ -34,6 +34,10 @@ class Resource(IResource, metaclass=ResourceMetaclass):
         return cls._meta.get_list_url()
 
     @classmethod
+    def get_retrieve_url(cls: type[T], resource_id: int | str | None) -> str:
+        return cls._meta.get_retrieve_url(resource_id)
+
+    @classmethod
     def get_next_url(
         cls,
         response: IResponse[Any, Any]
