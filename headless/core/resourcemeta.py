@@ -10,11 +10,13 @@ from typing import Any
 
 import inflect
 
+from headless.types import IResourceMeta
+
 
 engine: inflect.engine = inflect.engine()
 
 
-class ResourceMeta:
+class ResourceMeta(IResourceMeta):
     __module__: str = 'headless.core'
     base_endpoint: str
     content_type: str

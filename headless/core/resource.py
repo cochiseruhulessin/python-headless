@@ -48,7 +48,7 @@ class Resource(IResource, metaclass=ResourceMetaclass):
         raise NotImplementedError
 
     @classmethod
-    def process_response(cls, action: str, data: dict[str, Any]) -> dict[str, Any]:
+    def process_response(cls, action: str | None, data: dict[str, Any]) -> dict[str, Any]:
         """Process response data prior to parsing using the declared model."""
         return data
 

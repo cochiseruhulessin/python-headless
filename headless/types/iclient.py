@@ -109,12 +109,10 @@ class IClient(Generic[Request, Response]):
             response = await self.on_rate_limited(response)
         return response
 
-    async def retrieve(self, model: type[M] | str, resource_id: int | str | None = None) -> M:
+    async def retrieve(self, model: type[M], resource_id: int | str | None = None) -> M:
         """Discover the API endpoint using the class configuration
         and retrieve a single instance using the HTTP GET verb.
         """
-        if isinstance(model, str):
-            raise NotImplementedError
         response = await self.get(url=model.get_retrieve_url(resource_id))
         response.raise_for_status()
         self.check_json(response.headers)
@@ -146,7 +144,7 @@ class IClient(Generic[Request, Response]):
         """Hook to transform response data."""
         return data
 
-    def resource_factory(self, model: type[M], action, data: dict[str, Any]) -> M:
+    def resource_factory(self, model: type[M], action: str, data: dict[str, Any]) -> M:
         resource = model.parse_obj(model.process_response(action, data))
         self._inject_client(resource)
         return resource

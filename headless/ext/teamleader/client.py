@@ -19,7 +19,8 @@ class TeamleaderClient(Client):
     __module__: str = 'headless.ext.teamleader'
 
     async def retrieve(
-        self, model: type[M] | str,
+        self,
+        model: type[M],
         resource_id: int | str | None = None
     ) -> M:
         if isinstance(model, str):
