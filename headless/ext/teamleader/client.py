@@ -23,8 +23,6 @@ class TeamleaderClient(Client):
         model: type[M],
         resource_id: int | str | None = None
     ) -> M:
-        if isinstance(model, str):
-            raise NotImplementedError
         response = await self.post(
             url=model.get_retrieve_url(resource_id),
             json={'id': resource_id}

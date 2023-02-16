@@ -6,13 +6,17 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from .currentuser import CurrentUser
-from .product import Product
-from .user import User
+from ..resource import TeamleaderResource
+from .productprice import ProductPrice
 
 
-__all__: list[str] = [
-    'CurrentUser',
-    'Product',
-    'User'
-]
+class Product(TeamleaderResource):
+    id: str
+    name: str
+    description: str
+    code: str
+    purchase_price: ProductPrice | None = None
+    selling_price: ProductPrice | None = None
+
+    class Meta:
+        base_endpoint: str = '/products'

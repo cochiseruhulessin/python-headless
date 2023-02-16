@@ -13,6 +13,7 @@ from .v1 import *
 __all__: list[str] = [
     'TeamleaderClient',
     'CurrentUser',
+    'Product',
     'User'
 ]
 

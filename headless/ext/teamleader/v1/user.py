@@ -21,4 +21,4 @@ class User(TeamleaderResource):
     status: str = 'active'
 
     class Meta:
-        base_endpoint: str = '/users.info'
+        base_endpoint: str = '/users'

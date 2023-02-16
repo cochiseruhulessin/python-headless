@@ -20,11 +20,11 @@ class TeamleaderResource(Resource):
 
     @classmethod
     def get_list_url(cls, *params: Any) -> str:
-        return str.lower(f'{cls._meta.pluralname}.list')
+        return str.lower(f'{cls._meta.base_endpoint}.list')
 
     @classmethod
     def get_retrieve_url(cls: type[T], resource_id: int | str | None) -> str:
-        return str.lower(f'{cls._meta.pluralname}.info')
+        return str.lower(f'{cls._meta.base_endpoint}.info')
 
     @classmethod
     def process_response(

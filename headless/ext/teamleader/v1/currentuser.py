@@ -20,7 +20,7 @@ class CurrentUser(User):
 
     @classmethod
     def get_retrieve_url(cls: type[T], resource_id: int | str | None) -> str:
-        return cls._meta.base_endpoint
+        return f'{cls._meta.base_endpoint}.me'
 
     class Meta: # type: ignore
-        base_endpoint: str = '/users.me'
+        base_endpoint: str = '/users'
