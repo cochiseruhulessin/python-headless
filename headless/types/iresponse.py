@@ -34,6 +34,10 @@ class IResponse(Generic[Request, Response]):
         return cls(request, response)
 
     @property
+    def content(self) -> bytes:
+        return self.get_content()
+
+    @property
     def headers(self) -> Headers:
         return self.get_headers()
 
@@ -52,6 +56,9 @@ class IResponse(Generic[Request, Response]):
     def __init__(self, request: IRequest[Request], response: Response) -> None:
         self._request = request
         self._response = response
+
+    def get_content(self) -> bytes:
+        raise NotImplementedError
 
     def get_headers(self) -> Headers:
         raise NotImplementedError

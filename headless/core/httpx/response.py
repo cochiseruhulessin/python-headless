@@ -17,6 +17,9 @@ from headless.types import IResponse
 class Response(IResponse[httpx.Request, httpx.Response]):
     __module__: str = 'headless.core.httpx'
 
+    def get_content(self) -> bytes:
+        return self._response.content
+
     def get_headers(self) -> Headers:
         return Headers(dict(self._response.headers.items()))
 
