@@ -7,11 +7,13 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from .currentuser import CurrentUser
+from .customfielddefinition import CustomFieldDefinition
 from .product import Product
 from .user import User
 
 
 __all__: list[str] = [
+    'CustomFieldDefinition',
     'CurrentUser',
     'Product',
     'User'
