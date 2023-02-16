@@ -93,10 +93,12 @@ class IClient(Generic[Request, Response]):
             response = await self.on_rate_limited(response)
         return response
 
-    async def retrieve(self, model: type[M], resource_id: int | str) -> M:
+    async def retrieve(self, model: type[M] | str, resource_id: int | str) -> M:
         """Discover the API endpoint using the class configuration
         and retrieve a single instance using the HTTP GET verb.
         """
+        if isinstance(model, str):
+            raise NotImplementedError
         response = await self.request(
             method='GET',
             url=model._meta.get_retrieve_url(resource_id) # type: ignore
