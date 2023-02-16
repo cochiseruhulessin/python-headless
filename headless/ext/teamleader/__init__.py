@@ -7,7 +7,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from .client import TeamleaderClient
-from .v1 import *
+from .v2022_09_15 import *
 
 
 __all__: list[str] = [

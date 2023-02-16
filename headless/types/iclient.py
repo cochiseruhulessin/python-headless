@@ -85,9 +85,10 @@ class IClient(Generic[Request, Response]):
         url: str,
         credential: ICredential | None = None,
         json: list[Any] | dict[str, Any] | None = None,
-        params: dict[str, Any] | None = None
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None
     ) -> IResponse[Request, Response]:
-        headers: dict[str, str] = {}
+        headers: dict[str, str] = headers or {}
         headers.setdefault('User-Agent', self.user_agent)
         if json is not None:
             headers['Content-Type'] = 'application/json'
@@ -113,7 +114,11 @@ class IClient(Generic[Request, Response]):
         """Discover the API endpoint using the class configuration
         and retrieve a single instance using the HTTP GET verb.
         """
-        response = await self.get(url=model.get_retrieve_url(resource_id))
+        meta = model.get_meta()
+        response = await self.get(
+            url=model.get_retrieve_url(resource_id),
+            headers=meta.headers
+        )
         response.raise_for_status()
         self.check_json(response.headers)
         data = self.process_response('retrieve', await response.json())
@@ -197,9 +202,11 @@ class IClient(Generic[Request, Response]):
         url: str | None = None
     ) -> Generator[M, None, None]:
         """Like :meth:`list()`, but returns all entities."""
+        meta = model.get_meta()
         response = await self.request(
             method='GET',
-            url=url or model.get_list_url(*params)
+            url=url or model.get_list_url(*params),
+            headers=meta.headers
         )
         response.raise_for_status()
         self.check_json(response.headers)
@@ -221,9 +228,11 @@ class IClient(Generic[Request, Response]):
         """Discover the API endpoint using the class configuration
         and retrieve a list of instances using the HTTP GET verb.
         """
+        meta = model.get_meta()
         response = await self.request(
             method='GET',
-            url=model.get_list_url()
+            url=model.get_list_url(),
+            headers=meta.headers
         )
         response.raise_for_status()
         self.check_json(response.headers)

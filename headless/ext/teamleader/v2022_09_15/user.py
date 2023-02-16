@@ -7,16 +7,18 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from ..resource import TeamleaderResource
-from .productprice import ProductPrice
 
 
-class Product(TeamleaderResource):
+class User(TeamleaderResource):
     id: str
-    name: str
-    description: str
-    code: str
-    purchase_price: ProductPrice | None = None
-    selling_price: ProductPrice | None = None
+    first_name: str
+    last_name: str
+    email: str
+    #TODO: telephones
+    language: str
+    function: str | None = None
+    timezone: str = 'Europe/Amsterdam'
+    status: str = 'active'
 
-    class Meta:
-        base_endpoint: str = '/products'
+    class Meta(TeamleaderResource.Meta):
+        base_endpoint: str = '/users'

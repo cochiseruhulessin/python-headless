@@ -39,3 +39,8 @@ class TeamleaderResource(Resource):
         else:
             raise NotImplementedError
         return data[k]
+
+    class Meta:
+        headers: dict[str, str] = {
+            'X-Api-Version': '2022-09-15'
+        }

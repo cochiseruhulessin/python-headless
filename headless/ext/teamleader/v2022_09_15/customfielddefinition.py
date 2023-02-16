@@ -24,5 +24,5 @@ class CustomFieldDefinition(TeamleaderResource):
     )
     extra_option_allowed: bool = False
 
-    class Meta:
+    class Meta(TeamleaderResource.Meta):
         base_endpoint: str = '/customFieldDefinitions'

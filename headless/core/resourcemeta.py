@@ -20,6 +20,7 @@ class ResourceMeta(IResourceMeta):
     __module__: str = 'headless.core'
     base_endpoint: str
     content_type: str
+    headers: dict[str, str]
     name: str
     persist_method: str
     pluralname: str
@@ -33,6 +34,7 @@ class ResourceMeta(IResourceMeta):
         params['base_endpoint'] = base_endpoint = getattr(meta, 'base_endpoint', None)
         params.update({
             'content_type': getattr(meta, 'content_type', 'application/json'),
+            'headers': getattr(meta, 'headers', {}),
             'name': getattr(meta, 'name', name),
             'pluralname': getattr(meta, 'pluralname', engine.plural_noun(name)),
             'persist_method': getattr(meta, 'persist_method', 'PUT')
@@ -51,10 +53,12 @@ class ResourceMeta(IResourceMeta):
         content_type: str,
         persist_method: str,
         pluralname: str,
-        base_endpoint: str
+        base_endpoint: str,
+        headers: dict[str, str]
     ):
         self.base_endpoint = base_endpoint
         self.content_type = content_type
+        self.headers = headers
         self.name = name
         self.persist_method = persist_method
         self.pluralname = pluralname

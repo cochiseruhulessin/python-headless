@@ -10,6 +10,7 @@
 
 class IResourceMeta:
     content_type: str
+    headers: dict[str, str]
 
     def get_list_url(self) -> str:
         raise NotImplementedError

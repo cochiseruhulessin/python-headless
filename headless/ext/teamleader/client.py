@@ -23,9 +23,11 @@ class TeamleaderClient(Client):
         model: type[M],
         resource_id: int | str | None = None
     ) -> M:
+        meta = model.get_meta()
         response = await self.post(
             url=model.get_retrieve_url(resource_id),
-            json={'id': resource_id}
+            json={'id': resource_id},
+            headers=meta.headers
         )
         response.raise_for_status()
         self.check_json(response.headers)

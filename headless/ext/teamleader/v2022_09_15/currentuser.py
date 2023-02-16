@@ -8,6 +8,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from typing import TypeVar
 
+from ..resource import TeamleaderResource
 from .user import User
 
 
@@ -22,5 +23,5 @@ class CurrentUser(User):
     def get_retrieve_url(cls: type[T], resource_id: int | str | None) -> str:
         return f'{cls._meta.base_endpoint}.me'
 
-    class Meta: # type: ignore
+    class Meta(TeamleaderResource.Meta): # type: ignore
         base_endpoint: str = '/users'
