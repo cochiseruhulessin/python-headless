@@ -12,6 +12,7 @@
     "all": [
       "aiohttp",
       "httpx",
+      "lxml",
       "pydantic"
     ],
     "aiohttp": [
@@ -20,7 +21,8 @@
     "httpx": [
       "httpx"
     ],
-    "picqer": ["httpx"]
+    "picqer": ["httpx"],
+    "xml": ["lxml"]
   },
   "classifiers": [
      "Development Status :: 4 - Beta",

@@ -32,6 +32,10 @@ class Client(IClient[httpx.Request, httpx.Response]):
         self.credential = credential or self.credential
         self.params = kwargs
         self._client = httpx.AsyncClient(base_url=base_url, **kwargs)
+        self._in_context = False
+
+    def in_context(self) -> bool:
+        return self._in_context
 
     async def request_factory(
         self,
@@ -51,8 +55,12 @@ class Client(IClient[httpx.Request, httpx.Response]):
         return Response.fromimpl(request, await self._client.send(request.impl))
 
     async def __aenter__(self: T) -> T:
-        await self._client.__aenter__()
+        if not self.in_context():
+            await self._client.__aenter__()
+            self._in_context = True
         return self
 
     async def __aexit__(self, cls: type[BaseException], *args: Any) -> bool | None:
-        await self._client.__aexit__(cls, *args)
+        if self.in_context():
+            self._in_context = False
+            await self._client.__aexit__(cls, *args)

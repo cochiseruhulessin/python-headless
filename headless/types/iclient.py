@@ -59,6 +59,13 @@ class IClient(Generic[Request, Response]):
         """
         raise NotImplementedError
 
+    async def get(
+        self,
+        url: str,
+        credential: ICredential | None = None
+    ) -> IResponse[Request, Response]:
+        return await self.request(url, credential=credential)
+
     async def persist(
         self,
         model: type[M],
@@ -105,9 +112,10 @@ class IClient(Generic[Request, Response]):
         """
         if isinstance(model, str):
             raise NotImplementedError
+        meta = model.get_meta()
         response = await self.request(
             method='GET',
-            url=model._meta.get_retrieve_url(resource_id) # type: ignore
+            url=meta.get_retrieve_url(resource_id)
         )
         response.raise_for_status()
         self.check_json(response.headers)

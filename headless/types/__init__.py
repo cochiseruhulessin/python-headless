@@ -13,6 +13,7 @@ from .iclient import IClient
 from .icredential import ICredential
 from .iresponse import IResponse
 from .iresource import IResource
+from .iresourcemeta import IResourceMeta
 from .irequest import IRequest
 from .nullbackoff import NullBackoff
 from .nullcredential import NullCredential
@@ -27,6 +28,7 @@ __all__: list[str] = [
     'IClient',
     'ICredential',
     'IResource',
+    'IResourceMeta',
     'IResponse',
     'IRequest',
     'NullBackoff',

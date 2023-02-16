@@ -7,12 +7,29 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from typing import Any
+from typing import TypeVar
 
 import pydantic
+
+from .iresourcemeta import IResourceMeta
+
+T = TypeVar('T', bound='IResource')
 
 
 class IResource(pydantic.BaseModel):
     __deferred__: dict[str, Any] = pydantic.PrivateAttr({})
+    _meta: IResourceMeta
+
+    @classmethod
+    def get_meta(cls) -> IResourceMeta:
+        return cls._meta
+
+    @classmethod
+    def get_retrieve_url(
+        cls: type[T],
+        resource_id: str
+    ) -> str:
+        raise NotImplementedError
 
     def get_persist_url(self) -> str:
         raise NotImplementedError
