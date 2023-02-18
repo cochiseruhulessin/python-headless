@@ -40,13 +40,14 @@ class Server:
         return self.metadata.authorization_endpoint
 
     @property
-    def token_endpoint(self) -> str:
-        assert self.metadata is not None
-        if self.metadata.token_endpoint is None:
-            raise NotImplementedError(
-                "Server does not provide a token endpoint."
-            )
-        return self.metadata.token_endpoint
+    def token_endpoint(self) -> str | None:
+        if self.metadata is not None:
+            return self.metadata.token_endpoint
+
+    @property
+    def userinfo_endpoint(self) -> str | None:
+        if self.metadata is not None:
+            return self.metadata.userinfo_endpoint
 
     def __init__(
         self,

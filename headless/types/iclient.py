@@ -108,6 +108,8 @@ class IClient(Generic[Request, Response]):
                 raise
         if response.status_code == 429:
             response = await self.on_rate_limited(response)
+        elif 400 <= response.status_code < 500:
+            response = await self.on_client_error(response)
         return response
 
     async def retrieve(self, model: type[M], resource_id: int | str | None = None) -> M:
@@ -123,6 +125,13 @@ class IClient(Generic[Request, Response]):
         self.check_json(response.headers)
         data = self.process_response('retrieve', await response.json())
         return self.resource_factory(model, 'retrieve', data)
+
+    async def on_client_error(
+        self,
+        response: IResponse[Any, Any]
+    ) -> NoReturn | IResponse[Any, Any]:
+        response.raise_for_status()
+        raise NotImplementedError
 
     async def on_rate_limited(
         self,

@@ -9,7 +9,11 @@
 from .authorizationcode import AuthorizationCode
 from .authorizationendpointresponse import AuthorizationEndpointResponse
 from .bearertokencredential import BearerTokenCredential
+from .claimset import ClaimSet
 from .clientauthenticationmethod import ClientAuthenticationMethod
+from .clientcredentialsrequest import ClientCredentialsRequest
+from .error import Error
+from .iobtainable import IObtainable
 from .servermetadata import ServerMetadata
 from .tokenresponse import TokenResponse
 
@@ -18,7 +22,11 @@ __all__: list[str] = [
     'AuthorizationCode',
     'AuthorizationEndpointResponse',
     'BearerTokenCredential',
+    'ClaimSet',
     'ClientAuthenticationMethod',
+    'ClientCredentialsRequest',
+    'Error',
+    'IObtainable',
     'ServerMetadata',
     'TokenResponse',
 ]
