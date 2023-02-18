@@ -27,6 +27,7 @@ from .iresponse import IResponse
 from .irequest import IRequest
 from .nullbackoff import NullBackoff
 from .nullcredential import NullCredential
+from .optionsresponse import OptionsResponse
 
 
 Request = TypeVar('Request')
@@ -65,6 +66,10 @@ class IClient(Generic[Request, Response]):
 
     async def post(self, **kwargs: Any) -> IResponse[Request, Response]:
         return await self.request(method='POST', **kwargs)
+
+    async def options(self, **kwargs) -> OptionsResponse:
+        response = await self.request(method='OPTIONS', **kwargs)
+        return OptionsResponse.parse_response(response)
 
     async def persist(
         self,

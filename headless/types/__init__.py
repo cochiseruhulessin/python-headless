@@ -17,6 +17,7 @@ from .iresourcemeta import IResourceMeta
 from .irequest import IRequest
 from .nullbackoff import NullBackoff
 from .nullcredential import NullCredential
+from .optionsresponse import OptionsResponse
 from .ratelimited import RateLimited
 from .serverdoesnotexist import ServerDoesNotExist
 
@@ -33,6 +34,7 @@ __all__: list[str] = [
     'IRequest',
     'NullBackoff',
     'NullCredential',
+    'OptionsResponse',
     'RateLimited',
     'ServerDoesNotExist'
 ]
