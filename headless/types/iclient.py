@@ -67,7 +67,7 @@ class IClient(Generic[Request, Response]):
     async def post(self, **kwargs: Any) -> IResponse[Request, Response]:
         return await self.request(method='POST', **kwargs)
 
-    async def options(self, **kwargs) -> OptionsResponse:
+    async def options(self, **kwargs: Any) -> OptionsResponse:
         response = await self.request(method='OPTIONS', **kwargs)
         return OptionsResponse.parse_response(response)
 
