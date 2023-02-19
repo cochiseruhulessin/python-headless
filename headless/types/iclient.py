@@ -61,6 +61,9 @@ class IClient(Generic[Request, Response]):
         """
         raise NotImplementedError
 
+    async def delete(self, **kwargs: Any) -> IResponse[Request, Response]:
+        return await self.request(method='DELETE', **kwargs)
+
     async def get(self, **kwargs: Any) -> IResponse[Request, Response]:
         return await self.request(method='GET', **kwargs)
 
