@@ -94,7 +94,8 @@ class IClient(Generic[Request, Response]):
         credential: ICredential | None = None,
         json: list[Any] | dict[str, Any] | None = None,
         params: dict[str, Any] | None = None,
-        headers: dict[str, str] | None = None
+        headers: dict[str, str] | None = None,
+        allow_none: bool = False
     ) -> IResponse[Request, Response]:
         headers: dict[str, str] = headers or {}
         headers.setdefault('User-Agent', self.user_agent)
@@ -116,6 +117,8 @@ class IClient(Generic[Request, Response]):
                 raise
         if response.status_code == 429:
             response = await self.on_rate_limited(response)
+        elif response.status_code == 404 and allow_none:
+            pass
         elif 400 <= response.status_code < 500:
             response = await self.on_client_error(response)
         return response
