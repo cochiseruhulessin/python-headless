@@ -141,8 +141,7 @@ class IClient(Generic[Request, Response]):
         self,
         response: IResponse[Any, Any]
     ) -> NoReturn | IResponse[Any, Any]:
-        response.raise_for_status()
-        raise NotImplementedError
+        return response
 
     async def on_rate_limited(
         self,
