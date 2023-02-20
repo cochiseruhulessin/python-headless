@@ -31,6 +31,7 @@ from .models import Error
 from .models import IObtainable
 from .models import TokenResponse
 from .models import ServerMetadata
+from .nullcredential import NullCredential
 from .server import Server
 
 
@@ -54,7 +55,7 @@ class Client(httpx.Client):
 
     def __init__(
         self,
-        client_id: str,
+        client_id: str | None,
         client_secret: str,
         issuer: str | None = None,
         client_auth: ClientAuthenticationMethod | None = None,
@@ -69,15 +70,19 @@ class Client(httpx.Client):
             token_endpoint=token_endpoint,
             **kwargs
         )
-        super().__init__(
-            base_url=issuer or '',
+
+        # If the client_id is None, then this client is configured for
+        # a limited set of operations such as discovery, userinfo, etc.
+        if client_id is None:
+            credential = NullCredential()
+        else:
             credential=ClientCredential(
                 server=self.server,
                 client_id=client_id,
                 client_secret=client_secret,
                 using=client_auth
-            ),
-        )
+            )
+        super().__init__(base_url=issuer or '', credential=credential)
 
     async def authorize(
         self,

@@ -40,6 +40,7 @@ class IClient(Generic[Request, Response]):
     """Specifies the interface for all API client implementations."""
     __module__: str = 'headless.types'
     backoff: IBackoff = NullBackoff()
+    base_url: str
     credential: ICredential = NullCredential()
     request_class: type[IRequest[Request]]
     response_class: type[IResponse[Request, Response]]

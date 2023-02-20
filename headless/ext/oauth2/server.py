@@ -22,6 +22,7 @@ class Server:
     """Represents an OAuth 2.0 and provides an interface to
     inspect the server capabilities.
     """
+    _metadata: dict[str, ServerMetadata] = {}
     client: IClient[Any, Any]
     url: str
     metadata: ServerMetadata | None
@@ -38,6 +39,14 @@ class Server:
                 "Server does not implement authorization code flow."
             )
         return self.metadata.authorization_endpoint
+
+    @property
+    def metadata(self) -> ServerMetadata | None:
+        return Server._metadata.get(self.client.base_url)
+
+    @metadata.setter
+    def metadata(self, value: ServerMetadata) -> None:
+        Server._metadata[self.client.base_url] = value
 
     @property
     def token_endpoint(self) -> str | None:
