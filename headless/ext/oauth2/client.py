@@ -55,7 +55,7 @@ class Client(httpx.Client):
 
     def __init__(
         self,
-        client_id: str | None,
+        client_id: str | None = None,
         client_secret: str | None = None,
         issuer: str | None = None,
         client_auth: ClientAuthenticationMethod | None = None,
@@ -196,7 +196,10 @@ class Client(httpx.Client):
         originate from the configured authorization server.
         """
         assert self.metadata is not None
-        await self.credential.keychain
+        keychain = None
+        if self.credential.keychain:
+            await self.credential.keychain
+            keychain = self.credential.keychain
         if self.jwks is None:
             self.jwks = JSONWebKeySet()
             if self.metadata.jwks_uri is not None:
@@ -213,7 +216,7 @@ class Client(httpx.Client):
                 else:
                     self.jwks = JSONWebKeySet.parse_obj(await response.json())
         codec = PayloadCodec(
-            decrypter=self.credential.keychain,
+            decrypter=keychain,
             verifier=self.jwks
         )
         try:
@@ -230,3 +233,8 @@ class Client(httpx.Client):
             return False
 
         return True
+
+    async def __aenter__(self):
+        await super().__aenter__()
+        await self.discover()
+        return self

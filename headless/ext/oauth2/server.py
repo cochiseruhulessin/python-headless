@@ -70,7 +70,7 @@ class Server:
     async def discover(self: T) -> T:
         if self.metadata is None:
             for url in self.discovery_urls:
-                response = await self.client.get(url=url)
+                response = await self.client.get(url=url, allow_none=True)
                 if response.status_code != 200:
                     continue
                 self.metadata = ServerMetadata.parse_obj(await response.json())

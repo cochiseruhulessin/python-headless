@@ -10,4 +10,4 @@ from headless.types import ICredential
 
 
 class NullCredential(ICredential):
-    pass
+    keychain: None = None
