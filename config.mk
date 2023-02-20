@@ -33,41 +33,42 @@ ifdef CI_COMMIT_REF_NAME
 BRANCH_NAME=$(CI_COMMIT_REF_NAME)
 endif
 DOCS_BASE_PATH="python/headless"
-DOCS_GS_BUCKET=unimatrix-docs
+DOCS_DOMAIN=docs.cochise.io
+DOCS_GS_BUCKET=docs.cochise.io
+GOOGLE_LB_NAME = docs-cochise-io
+GOOGLE_LB_PROJECT = cochise-mye9xe
 MINOR_VERSION=$(shell cut -d '.' -f 1,2 <<< "$$(cat VERSION)")
 
 
 google-authenticate:
-ifdef GOOGLE_APPLICATION_CREDENTIALS
-	@gcloud auth activate-service-account --key-file $(GOOGLE_APPLICATION_CREDENTIALS)
-endif
 
 
 deploy-docs-google-%:
 	@gsutil -m cp -r 'public/*' gs://$(DOCS_GS_BUCKET)/$(DOCS_BASE_PATH)/$(*)
 	@printf "Invalidating cache for docs.unimatrixone.io/$(DOCS_BASE_PATH)/$(*).\n"
-	@gcloud compute url-maps invalidate-cdn-cache copernicus \
-    --host docs.unimatrixone.io\
+	@gcloud compute url-maps invalidate-cdn-cache $(GOOGLE_LB_NAME) \
+    --host $(DOCS_DOMAIN)\
     --path "/$(DOCS_BASE_PATH)/$(*)/*"\
-		--project unimatrixinfra
+		--project $(GOOGLE_LB_PROJECT)
+
 
 
 deploy-docs: public google-authenticate
 	@printf "\nDeploying documentation for version $(MINOR_VERSION) "
 	@printf "to base path $(DOCS_BASE_PATH)/$(MINOR_VERSION).\n"
-	@gsutil -m cp -r 'public/*' gs://$(DOCS_GS_BUCKET)/$(DOCS_BASE_PATH)/$(MINOR_VERSION)
-	@printf "Invalidating cache for docs.unimatrixone.io/$(DOCS_BASE_PATH)/$(MINOR_VERSION).\n"
-	@gcloud compute url-maps invalidate-cdn-cache copernicus \
-    --host docs.unimatrixone.io\
-    --path "/$(DOCS_BASE_PATH)/$(MINOR_VERSION)/*"\
-		--project unimatrixinfra
-ifeq ($(BRANCH_NAME), mainline)
+	@gsutil cp -r 'public/*' gs://$(DOCS_GS_BUCKET)/$(DOCS_BASE_PATH)/$(MINOR_VERSION)/
+#ifeq ($(BRANCH_NAME), mainline)
 	@printf "\nDeploying documentation for latest "
 	@printf "to base path $(DOCS_BASE_PATH)/latest.\n"
 	@make deploy-docs-google-latest
-endif
-ifeq ($(BRANCH_NAME), stable)
-	@printf "\nDeploying documentation for stable "
-	@printf "to base path $(DOCS_BASE_PATH)/stable.\n"
-	@make deploy-docs-google-stable
-endif
+#endif
+	@printf "Invalidating cache for $(DOCS_DOMAIN)/$(DOCS_BASE_PATH)/.\n"
+	@gcloud compute url-maps invalidate-cdn-cache $(GOOGLE_LB_NAME) \
+    --host $(DOCS_DOMAIN)\
+    --path "/$(DOCS_BASE_PATH)/*"\
+		--project $(GOOGLE_LB_PROJECT)
+#ifeq ($(BRANCH_NAME), stable)
+#	@printf "\nDeploying documentation for stable "
+#	@printf "to base path $(DOCS_BASE_PATH)/stable.\n"
+#	@make deploy-docs-google-stable
+#endif
