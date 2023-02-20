@@ -56,7 +56,7 @@ class Client(httpx.Client):
     def __init__(
         self,
         client_id: str | None,
-        client_secret: str,
+        client_secret: str | None = None,
         issuer: str | None = None,
         client_auth: ClientAuthenticationMethod | None = None,
         authorization_endpoint: str | None = None,

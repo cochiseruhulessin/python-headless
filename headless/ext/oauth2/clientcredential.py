@@ -46,6 +46,11 @@ class ClientCredential(ICredential):
         self.server = server
         self.using = using or ClientAuthenticationMethod.none
 
+        # Authentication method is always None if no client_secret
+        # was given.
+        if client_secret is None:
+            self.using = ClientAuthenticationMethod.none
+
         # client_secret points to a key; configure the credential
         # to use the private_key_jwt authentication method.
         if self.client_secret is not None\

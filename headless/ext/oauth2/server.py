@@ -25,7 +25,6 @@ class Server:
     _metadata: dict[str, ServerMetadata] = {}
     client: IClient[Any, Any]
     url: str
-    metadata: ServerMetadata | None
     discovery_urls: list[str] = [
         '/.well-known/oauth-authorization-server',
         '.well-known/openid-configuration'
@@ -65,7 +64,6 @@ class Server:
         **params: Any
     ):
         self.client = client
-        self.metadata = None
         if params and not autodiscover:
             self.metadata = ServerMetadata.parse_obj(params)
 
