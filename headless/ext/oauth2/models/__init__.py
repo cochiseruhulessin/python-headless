@@ -14,7 +14,9 @@ from .clientauthenticationmethod import ClientAuthenticationMethod
 from .clientcredentialsrequest import ClientCredentialsRequest
 from .error import Error
 from .iobtainable import IObtainable
+from .oidctoken import OIDCToken
 from .servermetadata import ServerMetadata
+from .subjectidentifier import SubjectIdentifier
 from .tokenresponse import TokenResponse
 
 
@@ -27,6 +29,8 @@ __all__: list[str] = [
     'ClientCredentialsRequest',
     'Error',
     'IObtainable',
+    'OIDCToken',
     'ServerMetadata',
+    'SubjectIdentifier',
     'TokenResponse',
 ]

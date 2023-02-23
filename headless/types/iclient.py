@@ -47,6 +47,10 @@ class IClient(Generic[Request, Response]):
     logger: logging.Logger = logging.getLogger('headless.client')
     user_agent: str = 'Headless'
 
+    @property
+    def cookies(self) -> Any:
+        raise NotImplementedError
+
     def check_json(self, headers: Headers):
         # TODO: Abstract this to a separate class.
         content_type = headers.get('Content-Type') or ''
@@ -96,7 +100,8 @@ class IClient(Generic[Request, Response]):
         json: list[Any] | dict[str, Any] | None = None,
         params: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
-        allow_none: bool = False
+        allow_none: bool = False,
+        cookies: dict[str, str] | None = None
     ) -> IResponse[Request, Response]:
         headers: dict[str, str] = headers or {}
         headers.setdefault('User-Agent', self.user_agent)
@@ -107,7 +112,8 @@ class IClient(Generic[Request, Response]):
             url=url,
             headers=headers,
             json=json,
-            params=params
+            params=params,
+            cookies=cookies
         )
         await (credential or self.credential).add_to_request(request)
         try:
@@ -180,7 +186,8 @@ class IClient(Generic[Request, Response]):
         url: str,
         json: list[Any] | dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
-        params: dict[str, Any] | None = None
+        params: dict[str, Any] | None = None,
+        cookies: dict[str, str] | None = None
     ) -> Request:
         raise NotImplementedError
 

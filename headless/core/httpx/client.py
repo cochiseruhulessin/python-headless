@@ -28,6 +28,10 @@ class Client(IClient[httpx.Request, httpx.Response]):
     response_class: type[Response] = Response
     request_class: type[Request] = Request
 
+    @property
+    def cookies(self) -> Any:
+        return self._client.cookies
+
     def __init__(self, *, base_url: str, credential: ICredential | None = None, **kwargs: Any):
         self.base_url = base_url
         self.credential = credential or self.credential
@@ -44,14 +48,16 @@ class Client(IClient[httpx.Request, httpx.Response]):
         url: str,
         json: list[Any] | dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
-        params: dict[str, Any] | None = None
+        params: dict[str, Any] | None = None,
+        cookies: dict[str, str] | None = None
     ) -> httpx.Request:
         return self._client.build_request(
             method=method,
             url=url,
             json=json,
             headers=headers,
-            params=params
+            params=params,
+            cookies=cookies
         )
 
     async def send(self, request: IRequest[Any]) -> Response: # type: ignore

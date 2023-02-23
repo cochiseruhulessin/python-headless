@@ -51,6 +51,9 @@ class ClientCredential(ICredential):
         if client_secret is None:
             self.using = ClientAuthenticationMethod.none
 
+        # Assume client_secret_post when a secret is provided.
+        self.using = ClientAuthenticationMethod.client_secret_post
+
         # client_secret points to a key; configure the credential
         # to use the private_key_jwt authentication method.
         if self.client_secret is not None\
@@ -91,10 +94,6 @@ class ClientCredential(ICredential):
             return {**kwargs, 'url': url, 'json': json}
         assert self.client_secret is not None
         await self.keychain
-        self.codec = PayloadCodec(
-            decrypter=self.keychain,
-            signing_keys=[self.keychain.get(self.signing_key)]
-        )
         if self.using == ClientAuthenticationMethod.client_secret_post:
             assert isinstance(json, dict)
             json.update({
@@ -102,6 +101,10 @@ class ClientCredential(ICredential):
                 'client_secret': self.client_secret
             })
         elif self.using == ClientAuthenticationMethod.private_key_jwt:
+            self.codec = PayloadCodec(
+                decrypter=self.keychain,
+                signing_keys=[self.keychain.get(self.signing_key)]
+            )
             json.update({
                 'client_id': self.client_id,
                 'client_assertion': await self.create_assertion(

@@ -9,8 +9,8 @@
 import binascii
 import functools
 import logging
+import urllib.parse
 from typing import Any
-from typing import Iterable
 from typing import NoReturn
 
 from ckms.jose import PayloadCodec
@@ -29,6 +29,7 @@ from .models import ClientAuthenticationMethod
 from .models import ClientCredentialsRequest
 from .models import Error
 from .models import IObtainable
+from .models import OIDCToken
 from .models import TokenResponse
 from .models import ServerMetadata
 from .nullcredential import NullCredential
@@ -43,6 +44,8 @@ class Client(httpx.Client):
     credential: ClientCredential
     jwks: JSONWebKeySet | None = None
     logger: logging.Logger = logging.getLogger('headless.ext.oauth2')
+    scope: set[str]
+    trust_email: bool
 
     @property
     def client_id(self) -> str:
@@ -61,6 +64,8 @@ class Client(httpx.Client):
         client_auth: ClientAuthenticationMethod | None = None,
         authorization_endpoint: str | None = None,
         token_endpoint: str | None = None,
+        trust_email: bool = False,
+        scope: set[str] | None = None,
         **kwargs: Any
     ):
         self.server = Server(
@@ -70,6 +75,8 @@ class Client(httpx.Client):
             token_endpoint=token_endpoint,
             **kwargs
         )
+        self.scope = set(scope or set())
+        self.trust_email = trust_email
 
         # If the client_id is None, then this client is configured for
         # a limited set of operations such as discovery, userinfo, etc.
@@ -88,7 +95,9 @@ class Client(httpx.Client):
         self,
         state: str,
         redirect_uri: str | None,
-        scope: Iterable[str] | None = None
+        scope: set[str] | None = None,
+        nonce: str | None = None,
+        **extra: Any
     ) -> str:
         """Create an authorization request and return the URI to which
         the resource owner must be redirected.
@@ -100,22 +109,30 @@ class Client(httpx.Client):
         OAuth 2.x server. If the server does not allow omitting the
         `redirect_uri` parameter, this argument is mandatory.
         """
+        scope = set(scope or self.scope)
+        if nonce is not None:
+            scope.update({'openid', 'profile', 'email'})
+            extra.update({'nonce': nonce})
+        url=self.server.authorization_endpoint
         params: dict[str, str] = {
+            **extra,
             'client_id': self.credential.client_id,
             'state': state,
             'response_type': 'code',
         }
         if redirect_uri is not None:
             params['redirect_uri'] = redirect_uri
-        if scope is not None:
+        if scope:
             params['scope'] = str.join(' ', sorted(scope))
-        response = await self.get(
-            url=self.server.authorization_endpoint,
-            params=params
-        )
-        if not 300 <= response.status_code <= 400:
-            await self.on_authorize_endpoint_error(response)
-        return response.headers['Location']
+
+        # We encode the URL because some libraries use plus
+        # encoding.
+
+        # We encode the URL because some libraries use plus
+        # encoding.
+        url += '?' + urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
+        return url
+
 
     async def client_credentials(
         self,
@@ -188,14 +205,47 @@ class Client(httpx.Client):
         response = await self.get(url=self.server.userinfo_endpoint)
         return ClaimSet.parse_obj(await response.json())
 
+    async def verify_response(
+        self,
+        response: TokenResponse
+    ) -> None:
+        """Verifies the response from the authorization servers' token
+        endpoint.
+        """
+        pass
+
+    async def verify_oidc(
+        self,
+        token :str,
+        nonce: str | None = None,
+        audience: set[str] | None = None,
+        accept: set[str] | None = None,
+        verify_azp: bool = True,
+    ) -> bool:
+        """Return a boolean indicating if the token could be verified to
+        originate from the configured authorization server.
+        """
+        assert self.server.metadata is not None # nosec
+        is_valid = await self.verify(token, nonce=nonce, audience=audience, accept=accept)
+        jwt = OIDCToken.parse_jwt(token)
+        return is_valid and all([
+            jwt.iss == self.server.metadata.issuer,
+            jwt.nonce == nonce,
+            jwt.azp == self.client_id
+        ])
+
     async def verify(
         self,
-        token :str
+        token :str,
+        nonce: str | None = None,
+        audience: set[str] | None = None,
+        accept: set[str] | None = None
     ) -> bool:
         """Return a boolean indicating if the token could be verified to
         originate from the configured authorization server.
         """
         assert self.metadata is not None
+        accept = accept or {"at+jwt", "jwt"}
         keychain = None
         if self.credential.keychain:
             await self.credential.keychain
@@ -220,10 +270,7 @@ class Client(httpx.Client):
             verifier=self.jwks
         )
         try:
-            jwt = await codec.decode(
-                token=token,
-                accept={'jwt', 'at+jwt'}
-            )
+            jwt = await codec.decode(token=token, accept=accept)
             if not isinstance(jwt, JSONWebToken):
                 raise TypeError
             jwt.verify(
