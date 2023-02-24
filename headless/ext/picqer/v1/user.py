@@ -9,6 +9,7 @@
 import datetime
 from typing import Any
 
+from canonical import EmailAddress
 from headless.core import Resource
 from headless.types import IResponse
 
@@ -18,7 +19,7 @@ class User(Resource):
     username: str
     firstname: str
     lastname: str
-    emailaddress: str
+    emailaddress: EmailAddress
 
     # Mismatch with docs: language can be null
     language: str | None
