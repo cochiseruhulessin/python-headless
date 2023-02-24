@@ -40,7 +40,8 @@ class Resource(IResource, metaclass=ResourceMetaclass):
     @classmethod
     def get_next_url(
         cls,
-        response: IResponse[Any, Any]
+        response: IResponse[Any, Any],
+        n: int
     ) -> str | None:
         """Return the next URL when paginating, or ``None`` if there is
         no next URL.

@@ -37,6 +37,10 @@ class IRequest(Generic[Request]):
         return self._request
 
     @property
+    def params(self) -> list[tuple[str, str]]:
+        return self.get_params()
+
+    @property
     def url(self) -> str:
         return self.get_url()
 
@@ -45,6 +49,9 @@ class IRequest(Generic[Request]):
         self._request = request
 
     def add_header(self, name: str, value: str) -> None:
+        raise NotImplementedError
+
+    def get_params(self) -> list[tuple[str, str]]:
         raise NotImplementedError
 
     def get_url(self) -> str:

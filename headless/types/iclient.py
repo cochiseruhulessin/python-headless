@@ -245,7 +245,10 @@ class IClient(Generic[Request, Response]):
         ]
         while resources:
             yield resources.pop(0)
-        url = model.get_next_url(response)
+        try:
+            url = model.get_next_url(response, len(resources))
+        except StopIteration:
+            url = None
         if url is None:
             return
         async for resource in self.listall(model, *params, url=url):

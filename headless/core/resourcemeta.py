@@ -6,6 +6,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import urllib.parse
 from typing import Any
 
 import inflect
@@ -72,9 +73,12 @@ class ResourceMeta(IResourceMeta):
             raise TypeError("The `resource_id` parameter can not be None.")
         return f'{self.base_endpoint}/{resource_id}'
 
-    def get_list_url(self) -> str:
+    def get_list_url(self, **params: Any) -> str:
         """Return the URL to retrieve a list of instances of the
         resource. This is a relative URL to the API base endpoint
         that is configured with a client instance.
         """
-        return self.base_endpoint
+        qs = None
+        if params:
+            qs = f'?{urllib.parse.urlencode(params)}'
+        return f'{self.base_endpoint}{qs or ""}'

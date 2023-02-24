@@ -6,13 +6,13 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-
+from typing import Any
 
 class IResourceMeta:
     content_type: str
     headers: dict[str, str]
 
-    def get_list_url(self) -> str:
+    def get_list_url(self, **params: Any) -> str:
         raise NotImplementedError
 
     def get_retrieve_url(self, resource_id: int | str) -> str:

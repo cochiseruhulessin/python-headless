@@ -24,7 +24,11 @@ class ShopifyResource(Resource):
         return url
 
     @classmethod
-    def get_next_url(cls, response: IResponse[Any, Any]) -> str | None:
+    def get_next_url(
+        cls,
+        response: IResponse[Any, Any],
+        n: int
+    ) -> str | None:
         m = re.match('^<([^>]+)>; rel="next"', response.headers.get('link') or '')
         url = None
         if m is not None:

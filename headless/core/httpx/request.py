@@ -7,6 +7,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import functools
+import urllib.parse
 from typing import Any
 
 import httpx
@@ -20,6 +21,12 @@ class Request(IRequest[httpx.Request]):
 
     def add_header(self, name: str, value: str) -> None:
         self._request.headers[name] = value
+
+    def get_params(self) -> list[tuple[str, str]]:
+        params: list[tuple[str, str]] = []
+        if self._request.url.query:
+            params.extend(urllib.parse.parse_qsl(self._request.url.query.decode()))
+        return params
 
     def get_url(self) -> str:
         return str(self._request.url)

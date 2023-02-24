@@ -31,9 +31,13 @@ class User(Resource):
     @classmethod
     def get_next_url(
         cls,
-        response: IResponse[Any, Any]
+        response: IResponse[Any, Any],
+        n: int
     ) -> str | None:
-        raise NotImplementedError
+        if n == 0:
+            raise StopIteration
+        offset = int(dict(response.request.params).get('offset') or 0)
+        return cls._meta.get_list_url(offset=offset + 100)
 
     class Meta:
         base_endpoint: str = '/v1/users'
