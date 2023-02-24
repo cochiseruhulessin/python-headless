@@ -8,6 +8,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inspect
 import logging
+import urllib.parse
 from collections.abc import Iterable
 from collections.abc import Mapping
 from typing import Any
@@ -51,6 +52,10 @@ class IClient(Generic[Request, Response]):
     def cookies(self) -> Any:
         raise NotImplementedError
 
+    @property
+    def issuer(self) -> str:
+        return self.get_issuer()
+
     def check_json(self, headers: Headers):
         # TODO: Abstract this to a separate class.
         content_type = headers.get('Content-Type') or ''
@@ -59,6 +64,10 @@ class IClient(Generic[Request, Response]):
                 'Invalid response content type: '
                 f'{headers.get("Content-Type")}'
             )
+
+    def get_issuer(self) -> str:
+        p = urllib.parse.urlparse(self.base_url)
+        return f'{p.scheme}://{p.netloc}'
 
     def in_context(self) -> bool:
         """Return a boolean indicating if the client is current used as a
