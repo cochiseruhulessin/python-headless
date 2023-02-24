@@ -7,8 +7,10 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import datetime
+from typing import Any
 
 from headless.core import Resource
+from headless.types import IResponse
 
 
 class User(Resource):
@@ -25,6 +27,13 @@ class User(Resource):
     last_login_at: datetime.datetime | None = None
     created_at: datetime.datetime
     updated_at: datetime.datetime | None = None
+
+    @classmethod
+    def get_next_url(
+        cls,
+        response: IResponse[Any, Any]
+    ) -> str | None:
+        raise NotImplementedError
 
     class Meta:
         base_endpoint: str = '/v1/users'
