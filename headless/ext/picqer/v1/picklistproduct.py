@@ -21,4 +21,4 @@ class PicklistProduct(pydantic.BaseModel):
     amount_picked: int
     price: float
     weight: int
-    stock_location: str
+    stock_location: str | None = None
