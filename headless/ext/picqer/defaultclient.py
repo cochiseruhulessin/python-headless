@@ -18,6 +18,6 @@ class DefaultClient(Client):
     def __init__(self):
         httpx.Client.__init__(
             self=self,
-            base_url=os.environ['PICQER_API_DOMAIN'],
+            base_url=os.environ['PICQER_API_URL'],
             credential=PicqerEnvironmentCredential()
         )
