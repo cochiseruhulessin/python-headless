@@ -8,6 +8,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import pydantic
 
+from headless.core import Reference
+from .product import Product
+
 
 class PicklistProduct(pydantic.BaseModel):
     idproduct: int
@@ -22,3 +25,6 @@ class PicklistProduct(pydantic.BaseModel):
     price: float
     weight: int
     stock_location: str | None = None
+
+    # Our fields
+    product: Product = Reference(Product, 'idproduct')

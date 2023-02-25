@@ -34,6 +34,7 @@ __all__: list[str] = [
     'PicqerCredential',
     'Order',
     'Picklist',
+    'Product',
     'PurchaseOrder',
     'Supplier',
     'User',
