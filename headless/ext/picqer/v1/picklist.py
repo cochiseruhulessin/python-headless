@@ -10,6 +10,7 @@ import datetime
 
 from .picklistproduct import PicklistProduct
 from .picqerresource import PicqerResource
+from .pickliststatus import PicklistStatus
 
 
 class Picklist(PicqerResource):
@@ -36,7 +37,7 @@ class Picklist(PicqerResource):
     invoiced: bool
     urgent: bool
     preferred_delivery_date: datetime.date | None
-    status: str
+    status: PicklistStatus
     totalproducts: int
     totalpicked: int
     snoozed_until: datetime.datetime | None
@@ -48,7 +49,11 @@ class Picklist(PicqerResource):
     products: list[PicklistProduct] = []
 
     def is_open(self) -> bool:
-        return self.status not in {'cancelled', 'closed'}
+        return self.status not in {
+            PicklistStatus.cancelled,
+            PicklistStatus.cancelled,
+            PicklistStatus.snoozed
+        }
 
     class Meta:
         base_endpoint: str = '/v1/picklists'

@@ -8,6 +8,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from .order import Order
 from .picklist import Picklist
+from .pickliststatus import PicklistStatus
 from .purchaseorder import PurchaseOrder
 from .product import Product
 from .supplier import Supplier
@@ -19,6 +20,7 @@ from .webhook import Webhook
 __all__: list[str] = [
     'Order',
     'Picklist',
+    'PicklistStatus',
     'Product',
     'PurchaseOrder',
     'Supplier',
