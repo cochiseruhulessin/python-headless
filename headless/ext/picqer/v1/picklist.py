@@ -47,5 +47,8 @@ class Picklist(PicqerResource):
     idfulfilment_customer: int | None
     products: list[PicklistProduct] = []
 
+    def is_open(self) -> bool:
+        return self.status not in {'cancelled', 'closed'}
+
     class Meta:
         base_endpoint: str = '/v1/picklists'

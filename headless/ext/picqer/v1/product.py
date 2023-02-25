@@ -6,8 +6,12 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+from typing import Any
+
 from .picqerresource import PicqerResource
+from .productfield import ProductField
 from .productpricelist import ProductPricelist
+from .productstock import ProductStock
 
 
 class Product(PicqerResource):
@@ -38,6 +42,18 @@ class Product(PicqerResource):
     pricelists: list[ProductPricelist] = []
 
     # Not documented but present in response and Picqer examples.
+    productfields: list[ProductField] = []
+    images: list[str] = []
+    stock: list[ProductStock] = []
+
+    def get_product_field(self, idproductfield: int) -> Any | None:
+        for field in self.productfields:
+            if field.idproductfield == idproductfield:
+                value = field.value
+                break
+        else:
+            value = None
+        return value
 
     class Meta:
         base_endpoint: str = '/v1/products'
