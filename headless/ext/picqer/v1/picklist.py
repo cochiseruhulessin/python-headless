@@ -8,11 +8,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import datetime
 
-from headless.core import Resource
 from .picklistproduct import PicklistProduct
+from .picqerresource import PicqerResource
 
 
-class Picklist(Resource):
+class Picklist(PicqerResource):
     idpicklist: int
     picklistid: str
     idcustomer: int | None

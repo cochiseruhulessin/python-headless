@@ -8,14 +8,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import datetime
 
-from headless.core import Resource
 from headless.core import Reference
+from .picqerresource import PicqerResource
 from .purchaseorderproduct import PurchaseOrderProduct
 from .supplier import Supplier
 from .user import User
 
 
-class PurchaseOrder(Resource):
+class PurchaseOrder(PicqerResource):
     idpurchaseorder: int
     idsupplier: int | None = None
     idtemplate: int | None = None

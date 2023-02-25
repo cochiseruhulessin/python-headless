@@ -8,15 +8,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import datetime
 
-from headless.core import Resource
 from .orderfield import OrderField
 from .orderproduct import OrderProduct
 from .pickuppointdata import PickupPointData
 from .picklist import Picklist
+from .picqerresource import PicqerResource
 from .tag import Tag
 
 
-class Order(Resource):
+class Order(PicqerResource):
     idorder: int
     idcustomer: int | None = None
     idtemplate: int | None = None

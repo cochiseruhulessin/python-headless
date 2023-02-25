@@ -6,10 +6,10 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from headless.core import Resource
+from .picqerresource import PicqerResource
 
 
-class Supplier(Resource):
+class Supplier(PicqerResource):
     idsupplier: int
     name: str | None
     address: str | None = None

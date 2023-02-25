@@ -6,21 +6,16 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from .order import Order
-from .picklist import Picklist
-from .purchaseorder import PurchaseOrder
-from .supplier import Supplier
-from .user import User
-from .warehouse import Warehouse
-from .webhook import Webhook
+from .picqerresource import PicqerResource
 
 
-__all__: list[str] = [
-    'Order',
-    'Picklist',
-    'PurchaseOrder',
-    'Supplier',
-    'User',
-    'Warehouse',
-    'Webhook',
-]
+class Webhook(PicqerResource):
+    active: bool
+    address: str
+    event: str
+    idhook: int
+    name: str
+    secret: bool
+
+    class Meta:
+        base_endpoint: str = '/v1/hooks'

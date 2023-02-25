@@ -37,5 +37,6 @@ __all__: list[str] = [
     'PurchaseOrder',
     'Supplier',
     'User',
-    'Warehouse'
+    'Warehouse',
+    'Webhook',
 ]
