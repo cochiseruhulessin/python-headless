@@ -256,10 +256,12 @@ class IClient(Generic[Request, Response]):
             self.resource_factory(model, None, x)
             for x in data
         ]
+        n = 0
         while resources:
+            n =+ 1
             yield resources.pop(0)
         try:
-            url = model.get_next_url(response, len(resources))
+            url = model.get_next_url(response, n)
         except StopIteration:
             url = None
         if url is None:
