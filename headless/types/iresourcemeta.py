@@ -12,6 +12,9 @@ class IResourceMeta:
     content_type: str
     headers: dict[str, str]
 
+    def get_create_url(self, **params: Any) -> str:
+        raise NotImplementedError
+
     def get_list_url(self, **params: Any) -> str:
         raise NotImplementedError
 

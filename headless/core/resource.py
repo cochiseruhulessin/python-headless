@@ -30,6 +30,10 @@ class Resource(IResource, metaclass=ResourceMetaclass):
     _meta: ResourceMeta = pydantic.PrivateAttr()
 
     @classmethod
+    def get_create_url(cls, *params: Any) -> str:
+        return cls._meta.get_create_url()
+
+    @classmethod
     def get_list_url(cls, *params: Any) -> str:
         return cls._meta.get_list_url()
 

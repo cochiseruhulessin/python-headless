@@ -64,6 +64,9 @@ class ResourceMeta(IResourceMeta):
         self.persist_method = persist_method
         self.pluralname = pluralname
 
+    def get_create_url(self, **params: Any) -> str:
+        return self.base_endpoint
+
     def get_retrieve_url(self, resource_id: int | str | None) -> str:
         """Return the URL to retrieve a single instance of the
         resource. This is a relative URL to the API base endpoint
