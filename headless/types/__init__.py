@@ -19,6 +19,7 @@ from .nullbackoff import NullBackoff
 from .nullcredential import NullCredential
 from .optionsresponse import OptionsResponse
 from .ratelimited import RateLimited
+from .hints import RequestContent
 from .serverdoesnotexist import ServerDoesNotExist
 
 
@@ -36,5 +37,6 @@ __all__: list[str] = [
     'NullCredential',
     'OptionsResponse',
     'RateLimited',
+    'RequestContent',
     'ServerDoesNotExist'
 ]

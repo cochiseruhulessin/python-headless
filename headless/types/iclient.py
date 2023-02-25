@@ -20,6 +20,7 @@ from typing import TypeVar
 import pydantic
 
 from .headers import Headers
+from .hints import RequestContent
 from .ibackoff import IBackoff
 from .icredential import ICredential
 from .ratelimited import RateLimited
@@ -110,7 +111,8 @@ class IClient(Generic[Request, Response]):
         params: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
         allow_none: bool = False,
-        cookies: dict[str, str] | None = None
+        cookies: dict[str, str] | None = None,
+        content: RequestContent | None = None
     ) -> IResponse[Request, Response]:
         headers: dict[str, str] = headers or {}
         headers.setdefault('User-Agent', self.user_agent)
@@ -122,7 +124,8 @@ class IClient(Generic[Request, Response]):
             headers=headers,
             json=json,
             params=params,
-            cookies=cookies
+            cookies=cookies,
+            content=content
         )
         await (credential or self.credential).add_to_request(request)
         try:
@@ -196,7 +199,8 @@ class IClient(Generic[Request, Response]):
         json: list[Any] | dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
         params: dict[str, Any] | None = None,
-        cookies: dict[str, str] | None = None
+        cookies: dict[str, str] | None = None,
+        content: RequestContent | None = None,
     ) -> Request:
         raise NotImplementedError
 

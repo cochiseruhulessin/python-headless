@@ -14,6 +14,7 @@ import httpx
 from headless.types import IClient
 from headless.types import ICredential
 from headless.types import IRequest
+from headless.types import RequestContent
 from ..resource import Resource # type: ignore
 from .request import Request
 from .response import Response
@@ -49,7 +50,8 @@ class Client(IClient[httpx.Request, httpx.Response]):
         json: list[Any] | dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
         params: dict[str, Any] | None = None,
-        cookies: dict[str, str] | None = None
+        cookies: dict[str, str] | None = None,
+        content: RequestContent | None = None
     ) -> httpx.Request:
         return self._client.build_request(
             method=method,
@@ -57,7 +59,8 @@ class Client(IClient[httpx.Request, httpx.Response]):
             json=json,
             headers=headers,
             params=params,
-            cookies=cookies
+            cookies=cookies,
+            content=content
         )
 
     async def send(self, request: IRequest[Any]) -> Response: # type: ignore
