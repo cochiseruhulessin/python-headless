@@ -37,6 +37,7 @@ __all__: list[str] = [
     'PicklistStatus',
     'Product',
     'PurchaseOrder',
+    'Receipt',
     'Supplier',
     'User',
     'Warehouse',

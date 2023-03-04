@@ -11,6 +11,7 @@ import datetime
 from headless.core import Reference
 from .picqerresource import PicqerResource
 from .purchaseorderproduct import PurchaseOrderProduct
+from .receipt import Receipt
 from .supplier import Supplier
 from .user import User
 
@@ -34,7 +35,9 @@ class PurchaseOrder(PicqerResource):
     # in the Webhook documentation.
     completed_by_iduser: int | None = None
     completed_at: datetime.datetime | None = None
-    created_by_iduser: int
+
+    # TODO: Is None when created through API, not documented.
+    created_by_iduser: int | None = None
     created: datetime.datetime
     updated: datetime.datetime | None = None
     purchased_by_iduser: int | None = None
@@ -42,6 +45,12 @@ class PurchaseOrder(PicqerResource):
 
     # Our fields
     supplier: Supplier = Reference(Supplier, 'idsupplier')
+
+    async def create_receipt(self, remarks: str) -> Receipt:
+        return await self._client.create(Receipt, {
+            'idpurchaseorder': self.idpurchaseorder,
+            'remarks': remarks
+        })
 
     async def get_purchaser(self) -> User | None:
         return await self._client.retrieve(User, self.purchased_by_iduser)\

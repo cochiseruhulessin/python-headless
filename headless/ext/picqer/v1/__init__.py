@@ -11,6 +11,7 @@ from .picklist import Picklist
 from .pickliststatus import PicklistStatus
 from .purchaseorder import PurchaseOrder
 from .product import Product
+from .receipt import Receipt
 from .supplier import Supplier
 from .user import User
 from .warehouse import Warehouse
@@ -23,6 +24,7 @@ __all__: list[str] = [
     'PicklistStatus',
     'Product',
     'PurchaseOrder',
+    'Receipt',
     'Supplier',
     'User',
     'Warehouse',
