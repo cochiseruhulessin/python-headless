@@ -67,6 +67,12 @@ class ResourceMeta(IResourceMeta):
     def get_create_url(self, **params: Any) -> str:
         return self.base_endpoint
 
+    def get_delete_url(self, resource_id: int | str | None) -> str:
+        """Return the URL to delete a single instance of the resource.
+        The default implementation returns :meth:`get_retrieve_url()`.
+        """
+        return self.get_retrieve_url(resource_id=resource_id)
+
     def get_retrieve_url(self, resource_id: int | str | None) -> str:
         """Return the URL to retrieve a single instance of the
         resource. This is a relative URL to the API base endpoint

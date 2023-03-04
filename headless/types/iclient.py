@@ -85,6 +85,9 @@ class IClient(Generic[Request, Response]):
     async def post(self, **kwargs: Any) -> IResponse[Request, Response]:
         return await self.request(method='POST', **kwargs)
 
+    async def put(self, **kwargs: Any) -> IResponse[Request, Response]:
+        return await self.request(method='PUT', **kwargs)
+
     async def options(self, **kwargs: Any) -> OptionsResponse:
         response = await self.request(method='OPTIONS', **kwargs)
         return OptionsResponse.parse_response(response)
@@ -141,6 +144,31 @@ class IClient(Generic[Request, Response]):
         elif 400 <= response.status_code < 500:
             response = await self.on_client_error(response)
         return response
+
+    async def create(self, model: type[M], params: Any) -> M:
+        """Discover the API endpoint using the class configuration
+        and create an instance using the HTTP POST verb.
+        """
+        meta = model.get_meta()
+        response = await self.post(
+            url=meta.get_create_url(),
+            headers=meta.headers,
+            json=params
+        )
+        resource = model.parse_obj(await response.json())
+        resource._client = self
+        return resource
+
+    async def destroy(self, model: type[M], instance: M) -> M:
+        """Discover the API endpoint using the class configuration
+        and destroy an instance using the HTTP POST verb.
+        """
+        meta = model.get_meta()
+        response = await self.delete(
+            url=instance.get_delete_url(),
+            headers=meta.headers
+        )
+        response.raise_for_status()
 
     async def retrieve(self, model: type[M], resource_id: int | str | None = None) -> M:
         """Discover the API endpoint using the class configuration

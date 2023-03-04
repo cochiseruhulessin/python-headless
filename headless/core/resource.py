@@ -57,12 +57,22 @@ class Resource(IResource, metaclass=ResourceMetaclass):
         """Process response data prior to parsing using the declared model."""
         return data
 
+    @classmethod
+    async def create(cls: type[T], client: IClient[Any, Any], params: Any) -> T:
+        return await client.create(cls, params=params)
+
+    async def delete(self) -> None:
+        await self._client.destroy(type(self), instance=self)
+
     async def persist(self, client: IClient[Any, Any]):
         await client.persist(
             model=type(self),
             instance=self
         )
         self._client = client
+
+    def get_delete_url(self) -> str:
+        return self.get_persist_url()
 
     def __await__(self):
         async def f(): return self
