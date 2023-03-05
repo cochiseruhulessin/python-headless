@@ -20,6 +20,8 @@ from .nullcredential import NullCredential
 from .optionsresponse import OptionsResponse
 from .ratelimited import RateLimited
 from .hints import RequestContent
+from .resourcexception import ResourceException
+from .resourcexceptiontype import ResourceExceptionType
 from .serverdoesnotexist import ServerDoesNotExist
 
 
@@ -38,5 +40,7 @@ __all__: list[str] = [
     'OptionsResponse',
     'RateLimited',
     'RequestContent',
+    'ResourceException',
+    'ResourceExceptionType',
     'ServerDoesNotExist'
 ]

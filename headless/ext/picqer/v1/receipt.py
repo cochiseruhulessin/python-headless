@@ -10,6 +10,7 @@ import datetime
 import functools
 
 from .picqerresource import PicqerResource
+from .product import Product
 from .receiptproduct import ReceiptProduct
 from .receiptpurchaseorder import ReceiptPurchaseOrder
 from .receiptsupplier import ReceiptSupplier
@@ -57,7 +58,12 @@ class Receipt(PicqerResource):
     def _expects_by_sku(self, product: str) -> bool:
         return any([x.productcode == product for x in self.products])
 
-    async def receive(self, idproduct: int, amount: int = 1) -> ReceiptProduct:
+    async def receive(
+        self,
+        idproduct: int,
+        amount: int = 1,
+        idlocation: int | None = None
+    ) -> ReceiptProduct:
         """Register the receipt of `amount` products of a single type
         specified by `idproduct`.
         """
@@ -81,6 +87,17 @@ class Receipt(PicqerResource):
             response.raise_for_status()
             product = ReceiptProduct.parse_obj(await response.json())
             self.products.append(product)
+        if idlocation is not None:
+            # Prior to updating the receipt, we must ensure that the Product
+            # has the given location.
+            spec = await self._client.retrieve(Product, product.idproduct)
+            await spec.link_location(idlocation)
+            response = await self._client.put(
+                url=f'{self.get_persist_url()}/products/{product.idreceipt_product}',
+                json={'stock_idlocation': idlocation}
+            )
+            response.raise_for_status()
+
         return product
 
     async def complete(self) -> None:

@@ -46,6 +46,9 @@ class Product(PicqerResource):
     images: list[str] = []
     stock: list[ProductStock] = []
 
+    def get_persist_url(self) -> str:
+        return self.get_retrieve_url(self.idproduct)
+
     def get_product_field(self, idproductfield: int) -> Any | None:
         for field in self.productfields:
             if field.idproductfield == idproductfield:
@@ -54,6 +57,14 @@ class Product(PicqerResource):
         else:
             value = None
         return value
+    
+    async def link_location(self, idlocation: int) -> None:
+        """Links the specified location to this :class:`Product`."""
+        response = await self._client.post(
+            url=f'{self.get_persist_url()}/locations',
+            json={'idlocation': idlocation}
+        )
+        response.raise_for_status()
 
     class Meta:
         base_endpoint: str = '/v1/products'

@@ -15,6 +15,7 @@ from typing import Any
 from typing import Generic
 from typing import Generator
 from typing import NoReturn
+from typing import Union
 from typing import TypeVar
 
 import pydantic
