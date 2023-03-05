@@ -24,5 +24,8 @@ class ReceiptProduct(pydantic.BaseModel):
     # TODO: Shown in API examples but not in resource schema doc.
     abc_classification: str | None = None
     amount_receiving: int = 0
+    amount_more_than_ordered: int = 0 
+    amount_backorders: int = 0
     barcode: str | None = None
+    stock: int = 0
     productcode_supplier: str | None = None

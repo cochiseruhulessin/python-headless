@@ -7,6 +7,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import datetime
+import functools
 
 from .picqerresource import PicqerResource
 from .receiptproduct import ReceiptProduct
@@ -30,24 +31,60 @@ class Receipt(PicqerResource):
     created: datetime.datetime
     products: list[ReceiptProduct] = []
 
-    async def receive(self, product_id: int, amount: int = 1) -> None:
-        for product in self.products:
-            if product.idproduct != product_id:
+    def expects(self, product: int | str) -> bool:
+        """Return a boolean indicting if this :class:`Receipt` expects the
+        given product.
+        
+        Args:
+            product: identifies the expected product. May be an :class:`int`
+                (compare against :attr:`ReceiptProduct.idproduct`) or a
+                :class:`str` (compare against :attr:`ReceiptProduct.productcode`).
+
+        Returns:
+            :class:`bool`
+        """
+        return self._expects(product)
+
+    @functools.singledispatchmethod
+    def _expects(self, product: int | str) -> bool:
+        raise TypeError(type(product))
+
+    @_expects.register
+    def _expects_by_idproduct(self, product: int) -> bool:
+        return any([x.idproduct == product for x in self.products])
+    
+    @_expects.register
+    def _expects_by_sku(self, product: str) -> bool:
+        return any([x.productcode == product for x in self.products])
+
+    async def receive(self, idproduct: int, amount: int = 1) -> ReceiptProduct:
+        """Register the receipt of `amount` products of a single type
+        specified by `idproduct`.
+        """
+        for i, product in enumerate(self.products):
+            if product.idproduct != idproduct:
                 continue
             response = await self._client.put(
                 url=f'{self.get_persist_url()}/products/{product.idreceipt_product}',
                 json={'delta': amount}
             )
             response.raise_for_status()
+            product = self.products[i] = ReceiptProduct.parse_obj(await response.json())
             break
         else:
+            if amount > 1:
+                raise NotImplementedError
             response = await self._client.post(
                 url=f'{self.get_persist_url()}/products',
-                json={'idproduct': product_id, 'force': True}
+                json={'idproduct': idproduct, 'force': True}
             )
             response.raise_for_status()
+            product = ReceiptProduct.parse_obj(await response.json())
+            self.products.append(product)
+        return product
 
     async def complete(self) -> None:
+        """Mark the :class:`Receipt` as completed."""
         response = await self._client.put(
             url=self.get_persist_url(),
             json={"status": "completed"}
@@ -55,6 +92,9 @@ class Receipt(PicqerResource):
         response.raise_for_status()
 
     async def mark_all_received(self) -> None:
+        """Mark all products in the :class:`Receipt` as received for the amount
+        expected.
+        """
         response = await self._client.post(
             url=f'{self.get_persist_url()}/mark-all-received'
         )
