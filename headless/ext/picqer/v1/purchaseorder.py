@@ -46,6 +46,12 @@ class PurchaseOrder(PicqerResource):
     # Our fields
     supplier: Supplier = Reference(Supplier, 'idsupplier')
 
+    def get_persist_url(self) -> str:
+        return self.get_retrieve_url(self.idpurchaseorder)
+
+    def is_purchased(self) -> bool:
+        return self.status == 'purchased'
+
     async def create_receipt(self, remarks: str) -> Receipt:
         return await self._client.create(Receipt, {
             'idpurchaseorder': self.idpurchaseorder,
@@ -56,6 +62,15 @@ class PurchaseOrder(PicqerResource):
         return await self._client.retrieve(User, self.purchased_by_iduser)\
             if self.purchased_by_iduser is not None\
             else None
+
+    async def purchase(self) -> None:
+        """Mark the :class:`PurchaseOrder` as ``purchased``."""
+        if self.status != 'concept':
+            raise ValueError("Only 'concept' purchase orders can be marked as purchased.")
+        response = await self._client.post(
+            url=f'{self.get_persist_url()}/mark-as-purchased'
+        )
+        response.raise_for_status()
 
     class Meta:
         base_endpoint: str = '/v1/purchaseorders'

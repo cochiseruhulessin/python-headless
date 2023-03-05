@@ -58,6 +58,9 @@ class Receipt(PicqerResource):
     def _expects_by_sku(self, product: str) -> bool:
         return any([x.productcode == product for x in self.products])
 
+    def is_completed(self) -> bool:
+        return self.status == 'completed'
+
     async def receive(
         self,
         idproduct: int,
