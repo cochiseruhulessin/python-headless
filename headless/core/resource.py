@@ -58,6 +58,10 @@ class Resource(IResource, metaclass=ResourceMetaclass):
         return data
 
     @classmethod
+    def parse_resource(cls: type[T], obj: Any) -> T:
+        return cls.parse_obj(obj)
+
+    @classmethod
     async def create(cls: type[T], client: IClient[Any, Any], params: Any) -> T:
         return await client.create(cls, params=params)
 

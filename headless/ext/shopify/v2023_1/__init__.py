@@ -9,10 +9,12 @@
 from .inventorylevel import InventoryLevel
 from .order import Order
 from .product import Product
+from .webhook import Webhook
 
 
 __all__: list[str] = [
     'InventoryLevel',
     'Order',
     'Product',
+    'Webhook',
 ]

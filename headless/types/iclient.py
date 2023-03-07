@@ -156,7 +156,9 @@ class IClient(Generic[Request, Response]):
             headers=meta.headers,
             json=params
         )
-        resource = model.parse_obj(await response.json())
+        print(response.content)
+        response.raise_for_status()
+        resource = model.parse_resource(await response.json())
         resource._client = self
         return resource
 
