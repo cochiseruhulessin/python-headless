@@ -51,7 +51,8 @@ class Client(IClient[httpx.Request, httpx.Response]):
         headers: dict[str, str] | None = None,
         params: dict[str, Any] | None = None,
         cookies: dict[str, str] | None = None,
-        content: RequestContent | None = None
+        content: RequestContent | None = None,
+        data: dict[str, str] | None = None
     ) -> httpx.Request:
         return self._client.build_request(
             method=method,
@@ -60,7 +61,8 @@ class Client(IClient[httpx.Request, httpx.Response]):
             headers=headers,
             params=params,
             cookies=cookies,
-            content=content
+            content=content,
+            data=data
         )
 
     async def send(self, request: IRequest[Any]) -> Response: # type: ignore

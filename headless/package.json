@@ -6,7 +6,7 @@
   "licenses": "Proprietary",
   "install_requires": [
     "canonical>=0.24.1",
-    "ckms",
+    "ckms>=0.61.0",
     "inflect"
   ],
   "extras_require": {

@@ -11,6 +11,7 @@ from typing import Literal
 import pydantic
 
 from .bearertokencredential import BearerTokenCredential
+from .encodedidtoken import EncodedIDToken
 
 
 class TokenResponse(pydantic.BaseModel):
@@ -18,4 +19,4 @@ class TokenResponse(pydantic.BaseModel):
     expires_in: int
     access_token: BearerTokenCredential
     refresh_token: str | None = None
-    id_token: str | None = None
+    id_token: EncodedIDToken | None = None

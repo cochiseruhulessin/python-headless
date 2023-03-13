@@ -86,17 +86,21 @@ class ClientCredential(ICredential):
     async def preprocess_request( # type: ignore
         self,
         url: str,
-        json: dict[str, str],
+        json: dict[str, str] | None,
+        data: dict[str, str] | None,
         **kwargs: dict[str, Any]
     ) -> dict[str, Any]:
         now = self.now()
+        if (data or json) and not bool(json) ^ bool(data):
+            raise TypeError("Provide either 'data' or 'json'.")
+        params = data or json or {}
         if not self.must_authenticate(url):
             return {**kwargs, 'url': url, 'json': json}
         assert self.client_secret is not None
         await self.keychain
         if self.using == ClientAuthenticationMethod.client_secret_post:
-            assert isinstance(json, dict)
-            json.update({
+            assert isinstance(params, dict)
+            params.update({
                 'client_id': self.client_id,
                 'client_secret': self.client_secret
             })
@@ -105,7 +109,7 @@ class ClientCredential(ICredential):
                 decrypter=self.keychain,
                 signing_keys=[self.keychain.get(self.signing_key)]
             )
-            json.update({
+            params.update({
                 'client_id': self.client_id,
                 'client_assertion': await self.create_assertion(
                     aud=url,
@@ -123,7 +127,7 @@ class ClientCredential(ICredential):
             })
         else:
             raise NotImplementedError
-        return {**kwargs, 'url': url, 'json': json}
+        return {**kwargs, 'url': url, 'json': json, 'data': data}
 
     async def create_assertion(self, **claims: Any) -> str:
         """Create an assertion to prove the identity of the client."""

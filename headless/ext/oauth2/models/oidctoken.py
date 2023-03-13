@@ -8,11 +8,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from canonical import EmailAddress
 
-from .jsonwebtoken import JSONWebToken
+from .claimset import ClaimSet
 from .subjectidentifier import SubjectIdentifier
 
 
-class OIDCToken(JSONWebToken):
+class OIDCToken(ClaimSet):
     iss: str
     sub: str
     exp: int
@@ -43,3 +43,6 @@ class OIDCToken(JSONWebToken):
             SubjectIdentifier(iss=self.iss, sub=self.sub)
         ]
         return [x for x in values if x is not None]
+    
+    def claims(self) -> ClaimSet:
+        return ClaimSet.parse_obj(self)

@@ -116,7 +116,8 @@ class IClient(Generic[Request, Response]):
         headers: dict[str, str] | None = None,
         allow_none: bool = False,
         cookies: dict[str, str] | None = None,
-        content: RequestContent | None = None
+        content: RequestContent | None = None,
+        data: dict[str, str] | None = None
     ) -> IResponse[Request, Response]:
         headers: dict[str, str] = headers or {}
         headers.setdefault('User-Agent', self.user_agent)
@@ -129,7 +130,8 @@ class IClient(Generic[Request, Response]):
             json=json,
             params=params,
             cookies=cookies,
-            content=content
+            content=content,
+            data=data
         )
         await (credential or self.credential).add_to_request(request)
         try:
@@ -156,7 +158,6 @@ class IClient(Generic[Request, Response]):
             headers=meta.headers,
             json=params
         )
-        print(response.content)
         response.raise_for_status()
         resource = model.parse_resource(await response.json())
         resource._client = self

@@ -7,6 +7,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import binascii
+import copy
 import functools
 import logging
 import urllib.parse
@@ -14,10 +15,13 @@ from typing import Any
 from typing import NoReturn
 
 from ckms.jose import PayloadCodec
+from ckms.types import Algorithm
 from ckms.types import JSONWebKeySet
 from ckms.types import JSONWebToken
 from ckms.types import Malformed
 from ckms.types import InvalidSignature
+from ckms.types import KeyOperationType
+from ckms.types import KeyUseType
 from ckms.types.invalidtoken import InvalidToken
 
 from headless.core import httpx
@@ -66,6 +70,7 @@ class Client(httpx.Client):
         token_endpoint: str | None = None,
         trust_email: bool = False,
         scope: set[str] | None = None,
+        params: dict[str, str] | None = None,
         **kwargs: Any
     ):
         self.server = Server(
@@ -75,6 +80,7 @@ class Client(httpx.Client):
             token_endpoint=token_endpoint,
             **kwargs
         )
+        self.params = params
         self.scope = set(scope or set())
         self.trust_email = trust_email
 
@@ -89,7 +95,7 @@ class Client(httpx.Client):
                 client_secret=client_secret,
                 using=client_auth
             )
-        super().__init__(base_url=issuer or '', credential=credential)
+        super().__init__(base_url=issuer or '', credential=credential, **kwargs)
 
     async def authorize(
         self,
@@ -124,6 +130,9 @@ class Client(httpx.Client):
             params['redirect_uri'] = redirect_uri
         if scope:
             params['scope'] = str.join(' ', sorted(scope))
+
+        if self.params is not None:
+            params.update(copy.deepcopy(self.params))
 
         # We encode the URL because some libraries use plus
         # encoding.
@@ -171,7 +180,7 @@ class Client(httpx.Client):
         }
         response = await self.post(
             url=self.server.token_endpoint,
-            json=params
+            data=params
         )
         response.raise_for_status()
         return TokenResponse.parse_obj(await response.json())
@@ -231,7 +240,7 @@ class Client(httpx.Client):
         return is_valid and all([
             jwt.iss == self.server.metadata.issuer,
             jwt.nonce == nonce,
-            jwt.azp == self.client_id
+            (jwt.azp == self.client_id) or jwt.azp is None
         ])
 
     async def verify(
@@ -265,6 +274,29 @@ class Client(httpx.Client):
                     )
                 else:
                     self.jwks = JSONWebKeySet.parse_obj(await response.json())
+
+        # TODO: Some identity providers (Microsoft) omit the key_ops, but
+        # as these are public keys we can determine the ops. This code
+        # should be moved when CKMS is being rewritten.
+        for k in self.jwks.keys:
+            if KeyOperationType.verify in k.key_ops:
+                continue
+            if k.use != KeyUseType.sign:
+                continue
+            k.key_ops.append(KeyOperationType.verify)
+
+            # Microsoft also omits the alg parameter, so try to retrieve
+            # if from the server metadata. If there is more than one we
+            # have a problem (TODO).
+            supported = self.metadata.id_token_signing_alg_values_supported or []
+            if not supported or len(supported) > 1:
+                raise RuntimeError(
+                    "Unable to determine the token signing algorithm from the metadata "
+                    "and JWKS provided by the authorization server."
+                )
+            if k.alg is None:
+                k.alg = Algorithm(supported[0])
+
         codec = PayloadCodec(
             decrypter=keychain,
             verifier=self.jwks
