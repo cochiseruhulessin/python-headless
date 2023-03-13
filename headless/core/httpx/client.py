@@ -6,9 +6,11 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import ssl
 from typing import Any
 from typing import TypeVar
 
+import certifi
 import httpx
 
 from headless.types import IClient
@@ -34,10 +36,16 @@ class Client(IClient[httpx.Request, httpx.Response]):
         return self._client.cookies
 
     def __init__(self, *, base_url: str, credential: ICredential | None = None, **kwargs: Any):
+        self.ssl = ssl.create_default_context()
+        self.ssl.load_verify_locations(certifi.where())
         self.base_url = base_url
         self.credential = credential or self.credential
         self.params = kwargs
-        self._client = httpx.AsyncClient(base_url=base_url, **kwargs)
+        self._client = httpx.AsyncClient(
+            base_url=base_url,
+            verify=self.ssl,
+            **kwargs
+        )
         self._in_context = False
 
     def in_context(self) -> bool:
