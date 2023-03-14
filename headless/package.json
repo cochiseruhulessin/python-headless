@@ -5,7 +5,7 @@
   "url": "https://gitlab.com/unimatrixone/libraries/python-unimatrix/headless",
   "licenses": "Proprietary",
   "install_requires": [
-    "canonical>=0.24.1",
+    "canonical>=0.29.0",
     "ckms>=0.61.0",
     "inflect"
   ],

@@ -272,7 +272,7 @@ class ClaimSet(JSONWebToken):
             if email_verified:
                 values['email_verified'] = iss in TRUSTED_ISSUERS
             else:
-                p = urllib.parse.urlparse(iss)
+                p = urllib.parse.urlparse(str(iss))
                 values['email_verified'] = email.domain in TRUSTED_DOMAINS[p.netloc]
 
         return values
